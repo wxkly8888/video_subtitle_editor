@@ -1,0 +1,252 @@
+1
+00:00:00,266 --> 00:00:01,133
+okay so
+
+2
+00:00:01,133 --> 00:00:01,700
+today we're gonna be
+
+3
+00:00:01,700 --> 00:00:03,733
+creating a really cool graphic novel or
+
+4
+00:00:03,733 --> 00:00:05,066
+half toned shader and blender
+
+5
+00:00:05,066 --> 00:00:06,900
+I'll make this as quick and simple as possible
+
+6
+00:00:06,900 --> 00:00:08,400
+and if you follow these steps carefully
+
+7
+00:00:08,400 --> 00:00:10,066
+we'll be wrapped up within a few minutes
+
+8
+00:00:11,566 --> 00:00:14,133
+all I've done here is that a UV sphere and a bass mesh
+
+9
+00:00:14,133 --> 00:00:15,266
+nothing too complicated
+
+10
+00:00:15,300 --> 00:00:15,733
+first
+
+11
+00:00:15,733 --> 00:00:18,066
+you're gonna want to go to the shader tab at the top
+
+12
+00:00:18,100 --> 00:00:20,400
+select everything you want the shader applied to
+
+13
+00:00:20,400 --> 00:00:23,200
+create a new shader called Graphic Novel or
+
+14
+00:00:23,200 --> 00:00:23,966
+whatever you'd like
+
+15
+00:00:23,966 --> 00:00:26,400
+go to the Red World tab at the right hand side
+
+16
+00:00:26,400 --> 00:00:27,933
+and set the color to black
+
+17
+00:00:28,166 --> 00:00:31,133
+press shift a and add shader to RGB
+
+18
+00:00:31,200 --> 00:00:33,766
+press shift a again and add texture coordinate
+
+19
+00:00:33,766 --> 00:00:35,333
+you're also going to want to make sure
+
+20
+00:00:35,333 --> 00:00:37,666
+that Wrangler is set on preferences
+
+21
+00:00:37,666 --> 00:00:39,000
+next we'll just add a viewer
+
+22
+00:00:39,000 --> 00:00:41,700
+will shift and ctrl on the texture coordinate and
+
+23
+00:00:41,700 --> 00:00:44,333
+left click so that the window connects to the viewer
+
+24
+00:00:44,333 --> 00:00:46,733
+press shift a and select Vector Math
+
+25
+00:00:46,733 --> 00:00:48,766
+change the add to multiply
+
+26
+00:00:48,900 --> 00:00:51,166
+and if you're noticing a pattern you're not wrong
+
+27
+00:00:51,166 --> 00:00:52,933
+shift a is our best friend
+
+28
+00:00:52,933 --> 00:00:55,666
+press shift a again and this time XYZ
+
+29
+00:00:56,000 --> 00:00:59,100
+drag the vector to the bottom vector of multiply
+
+30
+00:00:59,133 --> 00:01:00,533
+press shift a again
+
+31
+00:01:00,566 --> 00:01:01,566
+this time value
+
+32
+00:01:01,566 --> 00:01:03,333
+and put it under the texture coordinate
+
+33
+00:01:03,366 --> 00:01:06,666
+connect value to y on the combine XYZ note
+
+34
+00:01:07,000 --> 00:01:08,366
+set the value to 100
+
+35
+00:01:08,466 --> 00:01:11,333
+click shift a math change the multiply
+
+36
+00:01:11,600 --> 00:01:13,866
+set the value to 1920
+
+37
+00:01:14,200 --> 00:01:16,900
+1080 or 1.778
+
+38
+00:01:17,166 --> 00:01:19,300
+this is the resolution size of the screen
+
+39
+00:01:19,300 --> 00:01:21,400
+connect the value at the top to the X
+
+40
+00:01:21,400 --> 00:01:23,800
+duplicate multiply and set it to fraction
+
+41
+00:01:23,800 --> 00:01:26,100
+duplicate fraction and set it to dustance
+
+42
+00:01:26,100 --> 00:01:27,366
+connect it to the viewer
+
+43
+00:01:27,500 --> 00:01:30,266
+set the top to vector numbers to no point 5
+
+44
+00:01:30,533 --> 00:01:33,366
+click shift a math and select less than
+
+45
+00:01:33,400 --> 00:01:35,666
+set its threshold to no point 37
+
+46
+00:01:35,700 --> 00:01:39,366
+connect shader to RGB color to the threshold
+
+47
+00:01:39,533 --> 00:01:40,566
+click shift a again
+
+48
+00:01:40,600 --> 00:01:43,266
+map wrench and connect shader to RGB
+
+49
+00:01:43,266 --> 00:01:44,666
+color to its value
+
+50
+00:01:44,666 --> 00:01:46,366
+drag result of the threshold
+
+51
+00:01:46,500 --> 00:01:48,733
+and finally you're just going to want to click on the
+
+52
+00:01:48,733 --> 00:01:50,166
+green camera icon on the right
+
+53
+00:01:50,166 --> 00:01:51,666
+and drag a pass part 2
+
+54
+00:01:51,666 --> 00:01:53,966
+to 1 now you can do whatever you'd like with it
+
+55
+00:01:53,966 --> 00:01:55,866
+you can change the threshold of the dots
+
+56
+00:01:55,866 --> 00:01:57,066
+you can move around the light
+
+57
+00:01:57,066 --> 00:01:58,333
+you can move around the ball
+
+58
+00:01:58,333 --> 00:01:59,533
+you know I have got full
+
+59
+00:01:59,533 --> 00:02:01,733
+control over the effect using the nodes tab
+
+60
+00:02:01,900 --> 00:02:02,800
+and there you have it
+
+61
+00:02:02,800 --> 00:02:03,966
+a simple graphic novel
+
+62
+00:02:03,966 --> 00:02:06,400
+shader and blender using some basic geometry notes
+
+63
+00:02:06,400 --> 00:02:07,900
+all wrapped up in a few minutes
+

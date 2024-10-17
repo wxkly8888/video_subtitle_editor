@@ -16,7 +16,7 @@ class AssetSubtitle extends SubtitleProvider {
   Future<SubtitleObject> getSubtitle() async {
     // Preparing subtitle file data by reading the file.
     // final data = await rootBundle.loadString(path);
-    final data =  await rootBundle.loadString("assets/test.srt");
+    final data =  await rootBundle.loadString(path);
     print("srt data1111111:$data");
     // Find the current format type of subtitle.
     final ext = extension(path);

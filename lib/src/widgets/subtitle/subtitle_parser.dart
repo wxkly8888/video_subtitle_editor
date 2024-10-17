@@ -13,17 +13,6 @@ Stream<List<Subtitle>> generateSubtitles(
   );
   await controller.initial();
   List<Subtitle> subtitles = controller.getAllTitles();
+  print("subtitles size:${subtitles.length}");
   yield subtitles;
-  //! By using objects
-  // var object = SubtitleObject(
-  //   data: vttData,
-  //   type: SubtitleType.vtt,
-  // );
-  // var parser = SubtitleParser(object);
-  // printResult(parser.parsing());
-  //
-  // for (int i = 1; i <= quantity; i++) {
-  //   subtitleList.add("subtitle:${(eachPart * i).toInt()}");
-  //  yield subtitleList;
-  // }
 }

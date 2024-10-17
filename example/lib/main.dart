@@ -83,12 +83,10 @@ class VideoEditor extends StatefulWidget {
 class _VideoEditorState extends State<VideoEditor> {
   final _exportingProgress = ValueNotifier<double>(0.0);
   final _isExporting = ValueNotifier<bool>(false);
-  final double height = 100;
+  final double height = 200;
 
   late final VideoEditorController _controller = VideoEditorController.file(
     widget.file,
-    minDuration: const Duration(seconds: 1),
-    maxDuration: const Duration(seconds: 10),
   );
 
   @override
@@ -171,35 +169,41 @@ class _VideoEditorState extends State<VideoEditor> {
                         Expanded(
                           child: Column(
                             children: [
-                              AnimatedBuilder(
-                                animation: _controller.video,
-                                builder: (_, __) => AnimatedOpacity(
-                                  opacity: _controller.isPlaying ? 0 : 1,
-                                  duration: kThemeAnimationDuration,
-                                  child: GestureDetector(
-                                    onTap: _controller.video.play,
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.play_arrow,
-                                        color: Colors.black,
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  buildVideoView(_controller),
+                                  AnimatedBuilder(
+                                    animation: _controller.video,
+                                    builder: (_, __) => AnimatedOpacity(
+                                      opacity: _controller.isPlaying ? 0 : 1,
+                                      duration: kThemeAnimationDuration,
+                                      child: GestureDetector(
+                                        onTap: _controller.video.play,
+                                        child: Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.play_arrow,
+                                            color: Colors.black,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                               Container(
-                                height: 400,
+                                height: 300,
                                 margin: const EdgeInsets.only(top: 10),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: _trimSlider(),
-                                ),
+                                child:SubtitleSlider(
+                                      controller: _controller,
+                                      height: height,
+                                    ),
                               ),
                               ValueListenableBuilder(
                                 valueListenable: _isExporting,
@@ -292,6 +296,16 @@ class _VideoEditorState extends State<VideoEditor> {
     );
   }
 
+  /// Returns the [VideoViewer] tranformed with editing view
+  /// Paint rect on top of the video area outside of the crop rect
+  Widget buildVideoView(
+    VideoEditorController controller,
+  ) {
+    return VideoViewer(
+      controller: controller,
+    );
+  }
+
   String formatter(Duration duration) => [
         duration.inMinutes.remainder(60).toString().padLeft(2, '0'),
         duration.inSeconds.remainder(60).toString().padLeft(2, '0')
@@ -312,27 +326,11 @@ class _VideoEditorState extends State<VideoEditor> {
             child: Row(children: [
               Text(formatter(Duration(seconds: pos.toInt()))),
               const Expanded(child: SizedBox()),
-              AnimatedOpacity(
-                opacity: _controller.isTrimming ? 1 : 0,
-                duration: kThemeAnimationDuration,
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(formatter(_controller.startTrim)),
-                  const SizedBox(width: 10),
-                  Text(formatter(_controller.endTrim)),
-                ]),
-              ),
             ]),
           );
         },
       ),
-      Container(
-        width: MediaQuery.of(context).size.width,
-        margin: EdgeInsets.symmetric(vertical: height / 4),
-        child: SubtitleSlider(
-          controller: _controller,
-          height: height,
-        ),
-      )
+
     ];
   }
 }

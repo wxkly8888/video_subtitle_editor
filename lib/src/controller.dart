@@ -46,9 +46,7 @@ class VideoEditorController extends ChangeNotifier {
   })  : _video = VideoPlayerController.file(File(
           // https://github.com/flutter/flutter/issues/40429#issuecomment-549746165
           Platform.isIOS ? Uri.encodeFull(file.path) : file.path,
-        )),
-        assert(maxDuration > minDuration,
-            'The maximum duration must be bigger than the minimum duration');
+        ));
 
   int _rotation = 0;
   bool _isTrimming = false;

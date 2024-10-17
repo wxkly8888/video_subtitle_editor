@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:subtitle/subtitle.dart';
 import 'package:video_subtitle_editor/src/controller.dart';
@@ -6,11 +5,9 @@ import 'package:video_subtitle_editor/src/utils/helpers.dart';
 import 'package:video_subtitle_editor/src/widgets/subtitle/subtitle_parser.dart';
 
 class SubtitleSlider extends StatefulWidget {
-
   const SubtitleSlider({
     super.key,
     required this.controller,
-
     this.height = 60,
     this.horizontalMargin = 20,
   });
@@ -28,6 +25,7 @@ class SubtitleSlider extends StatefulWidget {
 
 class _SubtitleSliderState extends State<SubtitleSlider> {
   final ValueNotifier<Rect> _rect = ValueNotifier<Rect>(Rect.zero);
+
   /// The max width of [SubtitleSlider]
   double _sliderWidth = 1.0;
   static const double perPixelInSec = 10.0;
@@ -36,7 +34,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   late Size _maxLayout = _calculateMaxLayout();
   late double _horizontalMargin;
   late final Stream<List<Subtitle>> _stream = (() => _generateSubtitles())();
-
 
   @override
   void initState() {
@@ -48,9 +45,10 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     //widget.controller.addListener(_updateTrim);
     _scrollController.addListener(attachScroll);
   }
-  calculateSliderWidth(VideoEditorController controller){
+
+  calculateSliderWidth(VideoEditorController controller) {
     final duration = controller.videoDuration.inSeconds;
-    _sliderWidth = duration.toDouble()* perPixelInSec;
+    _sliderWidth = duration.toDouble() * perPixelInSec;
     print("_sliderWidth: $_sliderWidth");
   }
 
@@ -64,8 +62,8 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   void _scaleRect() {
     _rect.value = calculateCroppedRect(widget.controller, _layout);
     _maxLayout = _calculateMaxLayout();
-
   }
+
   void attachScroll() {
     if (_scrollController.position.isScrollingNotifier.value) {
       print("attachTrimToScroll called offset: ${_scrollController.offset}");
@@ -73,6 +71,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
       _controllerSeekTo(_scrollController.offset);
     }
   }
+
   /// Scroll to update [_rect] and trim values on scroll
   /// Will fix [_rect] to the scroll view when it is bouncing
   /// Sets the video's current timestamp to be at the [position] on the slider
@@ -85,10 +84,8 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
         to > widget.controller.endTrim ? widget.controller.endTrim : to);
   }
 
-
-  Stream<List<Subtitle>> _generateSubtitles() => generateSubtitles(
-      widget.controller
-  );
+  Stream<List<Subtitle>> _generateSubtitles() =>
+      generateSubtitles(widget.controller);
 
   /// Returns the max size the layout should take with the rect value
   Size _calculateMaxLayout() {
@@ -106,66 +103,78 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     }
     return size;
   }
-  double computeWidth(Subtitle subtitle){
+
+  double computeWidth(Subtitle subtitle) {
     final start = subtitle.start.inMilliseconds;
     final end = subtitle.end.inMilliseconds;
     final duration = widget.controller.videoDuration.inMilliseconds;
     final width = (_sliderWidth * (end - start)) / duration;
     return width;
   }
-  double computeStartX(Subtitle subtitle){
+
+  double computeStartX(Subtitle subtitle) {
     final start = subtitle.start.inMilliseconds;
     final duration = widget.controller.videoDuration.inMilliseconds;
     final startX = (_sliderWidth * start) / duration;
     return startX;
   }
+
   @override
   Widget build(BuildContext context) {
-    return
-      SingleChildScrollView(
+    return SingleChildScrollView(
         controller: _scrollController,
-        physics:  const BouncingScrollPhysics(),
-    scrollDirection: Axis.horizontal,
-    child:LayoutBuilder(builder: (_, box) {
-      return StreamBuilder<List<Subtitle>>(
-        stream: _stream,
-        builder: (_, snapshot) {
-          final data = snapshot.data;
-          if(data==null) return const SizedBox();
-          return snapshot.hasData
-              ? Padding(padding:
-          EdgeInsets.symmetric(horizontal: _horizontalMargin),
-          child:  Stack(
-            children: data.map((subtitle) {
-              double width = computeWidth(subtitle);
-              double startX = computeStartX(subtitle);
-              return Positioned(
-                left: startX,
-                child: SizedBox(
-                  width: width,
-                  height: 100,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF974836),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      subtitle.data,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ))
-              : const SizedBox();
-        },
-      );
-    }));
+        physics: const BouncingScrollPhysics(),
+        scrollDirection: Axis.horizontal,
+        child: LayoutBuilder(builder: (_, box) {
+          return StreamBuilder<List<Subtitle>>(
+            stream: _stream,
+            builder: (_, snapshot) {
+              final data = snapshot.data;
+              print("snapshot.hasData: ${snapshot.hasData}");
+              if (data == null) return const SizedBox();
+              return snapshot.hasData
+                  ? Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: _horizontalMargin),
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            20,
+                          ),
+                          child: SizedBox(
+                              height: widget.height,
+                              width: _sliderWidth,
+                              child: Stack(
+                                children: data.map((subtitle) {
+                                  double width = computeWidth(subtitle);
+                                  double startX = computeStartX(subtitle);
+                                  return Positioned(
+                                    left: startX,
+                                    child: SizedBox(
+                                      width: width,
+                                      height: 100,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF974836),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          subtitle.data,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ))))
+                  : const SizedBox();
+            },
+          );
+        }));
   }
 }
