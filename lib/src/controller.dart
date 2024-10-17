@@ -4,6 +4,8 @@ import 'package:video_subtitle_editor/src/utils/helpers.dart';
 import 'package:video_subtitle_editor/src/models/cover_data.dart';
 import 'package:video_player/video_player.dart';
 
+import '../video_subtitle_editor.dart';
+
 class VideoMinDurationError extends Error {
   final Duration minDuration;
   final Duration videoDuration;
@@ -30,7 +32,8 @@ class VideoEditorController extends ChangeNotifier {
 
   /// Video from [File].
   final File file;
-
+  /// Style for [CropGridViewer]
+  final CropGridStyle cropStyle;
   /// Constructs a [VideoEditorController] that edits a video from a file.
   ///
   /// The [file] argument must not be null.
@@ -38,6 +41,8 @@ class VideoEditorController extends ChangeNotifier {
     this.file, {
     this.maxDuration = Duration.zero,
     this.minDuration = Duration.zero,
+    this.cropStyle = const CropGridStyle(),
+
   })  : _video = VideoPlayerController.file(File(
           // https://github.com/flutter/flutter/issues/40429#issuecomment-549746165
           Platform.isIOS ? Uri.encodeFull(file.path) : file.path,

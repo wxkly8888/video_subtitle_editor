@@ -1,16 +1,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:subtitle/subtitle.dart';
-import 'package:video_editor/src/controller.dart';
-import 'package:video_editor/src/utils/helpers.dart';
-import 'package:video_editor/src/utils/thumbnails.dart';
+import 'package:video_subtitle_editor/src/controller.dart';
+import 'package:video_subtitle_editor/src/utils/helpers.dart';
+import 'package:video_subtitle_editor/src/widgets/subtitle/subtitle_parser.dart';
 
 class SubtitleSlider extends StatefulWidget {
+
   const SubtitleSlider({
     super.key,
     required this.controller,
+
     this.height = 60,
+    this.horizontalMargin = 20,
   });
+
+  final double horizontalMargin;
 
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
@@ -25,17 +30,28 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   final ValueNotifier<Rect> _rect = ValueNotifier<Rect>(Rect.zero);
   /// The max width of [SubtitleSlider]
   double _sliderWidth = 1.0;
-
-  Size _layout = Size.zero;
+  static const double perPixelInSec = 10.0;
+  late final ScrollController _scrollController;
+  final Size _layout = Size.zero;
   late Size _maxLayout = _calculateMaxLayout();
+  late double _horizontalMargin;
+  late final Stream<List<Subtitle>> _stream = (() => _generateSubtitles())();
 
-
-  late Stream<List<Subtitle>> _stream = (() => _generateSubtitles())();
 
   @override
   void initState() {
     super.initState();
+    _horizontalMargin = widget.horizontalMargin;
+    calculateSliderWidth(widget.controller);
     widget.controller.addListener(_scaleRect);
+    _scrollController = ScrollController();
+    //widget.controller.addListener(_updateTrim);
+    _scrollController.addListener(attachScroll);
+  }
+  calculateSliderWidth(VideoEditorController controller){
+    final duration = controller.videoDuration.inSeconds;
+    _sliderWidth = duration.toDouble()* perPixelInSec;
+    print("_sliderWidth: $_sliderWidth");
   }
 
   @override
@@ -50,10 +66,29 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     _maxLayout = _calculateMaxLayout();
 
   }
+  void attachScroll() {
+    if (_scrollController.position.isScrollingNotifier.value) {
+      print("attachTrimToScroll called offset: ${_scrollController.offset}");
+      // update trim and video position
+      _controllerSeekTo(_scrollController.offset);
+    }
+  }
+  /// Scroll to update [_rect] and trim values on scroll
+  /// Will fix [_rect] to the scroll view when it is bouncing
+  /// Sets the video's current timestamp to be at the [position] on the slider
+  /// If the expected position is bigger than [controller.endTrim], set it to [controller.endTrim]
+  void _controllerSeekTo(double position) async {
+    final to = widget.controller.videoDuration *
+        ((position + _scrollController.offset) /
+            (_sliderWidth + _horizontalMargin * 2));
+    await widget.controller.video.seekTo(
+        to > widget.controller.endTrim ? widget.controller.endTrim : to);
+  }
+
 
   Stream<List<Subtitle>> _generateSubtitles() => generateSubtitles(
-        widget.controller
-      );
+      widget.controller
+  );
 
   /// Returns the max size the layout should take with the rect value
   Size _calculateMaxLayout() {
@@ -86,15 +121,21 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (_, box) {
-      _sliderWidth = box.maxWidth;
+    return
+      SingleChildScrollView(
+        controller: _scrollController,
+        physics:  const BouncingScrollPhysics(),
+    scrollDirection: Axis.horizontal,
+    child:LayoutBuilder(builder: (_, box) {
       return StreamBuilder<List<Subtitle>>(
         stream: _stream,
         builder: (_, snapshot) {
           final data = snapshot.data;
           if(data==null) return const SizedBox();
           return snapshot.hasData
-              ? Stack(
+              ? Padding(padding:
+          EdgeInsets.symmetric(horizontal: _horizontalMargin),
+          child:  Stack(
             children: data.map((subtitle) {
               double width = computeWidth(subtitle);
               double startX = computeStartX(subtitle);
@@ -121,10 +162,10 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                 ),
               );
             }).toList(),
-          )
+          ))
               : const SizedBox();
         },
       );
-    });
+    }));
   }
 }

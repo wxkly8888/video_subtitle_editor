@@ -1,14 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:video_editor/src/controller.dart';
-import 'package:video_editor/src/utils/helpers.dart';
-import 'package:video_editor/src/models/transform_data.dart';
-import 'package:video_editor/src/widgets/crop/crop_grid.dart';
-import 'package:video_editor/src/widgets/crop/crop_grid_painter.dart';
-import 'package:video_editor/src/widgets/image_viewer.dart';
-import 'package:video_editor/src/widgets/transform.dart';
-import 'package:video_editor/src/widgets/video_viewer.dart';
+import 'package:video_subtitle_editor/src/controller.dart';
+import 'package:video_subtitle_editor/src/utils/helpers.dart';
+import 'package:video_subtitle_editor/src/models/transform_data.dart';
+import 'package:video_subtitle_editor/src/widgets/crop/crop_grid.dart';
+import 'package:video_subtitle_editor/src/widgets/crop/crop_grid_painter.dart';
+import 'package:video_subtitle_editor/src/widgets/crop/transform.dart';
+import 'package:video_subtitle_editor/src/widgets/video_viewer.dart';
 
 mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
   final ValueNotifier<Rect> rect = ValueNotifier<Rect>(Rect.zero);
@@ -74,27 +73,27 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
     );
   }
 
-  /// Returns the [ImageViewer] tranformed with editing view
-  /// Paint rect on top of the video area outside of the crop rect
-  Widget buildImageView(
-    VideoEditorController controller,
-    Uint8List bytes,
-    TransformData transform,
-  ) {
-    return SizedBox.fromSize(
-      size: layout,
-      child: CropTransformWithAnimation(
-        shouldAnimate: layout != Size.zero,
-        transform: transform,
-        child: ImageViewer(
-          controller: controller,
-          bytes: bytes,
-          child:
-              buildPaint(controller, showGrid: false, showCenterRects: false),
-        ),
-      ),
-    );
-  }
+  // /// Returns the [ImageViewer] tranformed with editing view
+  // /// Paint rect on top of the video area outside of the crop rect
+  // Widget buildImageView(
+  //   VideoEditorController controller,
+  //   Uint8List bytes,
+  //   TransformData transform,
+  // ) {
+  //   return SizedBox.fromSize(
+  //     size: layout,
+  //     child: CropTransformWithAnimation(
+  //       shouldAnimate: layout != Size.zero,
+  //       transform: transform,
+  //       child: ImageViewer(
+  //         controller: controller,
+  //         bytes: bytes,
+  //         child:
+  //             buildPaint(controller, showGrid: false, showCenterRects: false),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget buildPaint(
     VideoEditorController controller, {

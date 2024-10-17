@@ -5,8 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
-
-import 'crop_page.dart';
 import 'export_service.dart';
 
 void main() => runApp(
@@ -94,7 +92,7 @@ class _VideoEditorState extends State<VideoEditor> {
   );
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
     _controller
         .initialize(aspectRatio: 9 / 16)
@@ -171,110 +169,56 @@ class _VideoEditorState extends State<VideoEditor> {
                       children: [
                         _topNavBar(),
                         Expanded(
-                          child: DefaultTabController(
-                            length: 2,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: TabBarView(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    children: [
-                                          CropGridViewer.preview(
-                                              controller: _controller),
-                                          AnimatedBuilder(
-                                            animation: _controller.video,
-                                            builder: (_, __) => AnimatedOpacity(
-                                              opacity:
-                                                  _controller.isPlaying ? 0 : 1,
-                                              duration: kThemeAnimationDuration,
-                                              child: GestureDetector(
-                                                onTap: _controller.video.play,
-                                                child: Container(
-                                                  width: 40,
-                                                  height: 40,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: Colors.white,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.play_arrow,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  height: 400,
-                                  margin: const EdgeInsets.only(top: 10),
-                                  child: Column(
-                                    children: [
-                                      const TabBar(
-                                        tabs: [
-                                          Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                    padding: EdgeInsets.all(5),
-                                                    child: Icon(
-                                                        Icons.content_cut)),
-                                                Text('Trim')
-                                              ]),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Padding(
-                                                  padding: EdgeInsets.all(5),
-                                                  child:
-                                                      Icon(Icons.video_label)),
-                                              Text('Cover')
-                                            ],
-                                          ),
-                                        ],
+                          child: Column(
+                            children: [
+                              AnimatedBuilder(
+                                animation: _controller.video,
+                                builder: (_, __) => AnimatedOpacity(
+                                  opacity: _controller.isPlaying ? 0 : 1,
+                                  duration: kThemeAnimationDuration,
+                                  child: GestureDetector(
+                                    onTap: _controller.video.play,
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
                                       ),
-                                      Expanded(
-                                        child: TabBarView(
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                              children: _trimSlider(),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                ValueListenableBuilder(
-                                  valueListenable: _isExporting,
-                                  builder: (_, bool export, Widget? child) =>
-                                      AnimatedSize(
-                                    duration: kThemeAnimationDuration,
-                                    child: export ? child : null,
-                                  ),
-                                  child: AlertDialog(
-                                    title: ValueListenableBuilder(
-                                      valueListenable: _exportingProgress,
-                                      builder: (_, double value, __) => Text(
-                                        "Exporting video ${(value * 100).ceil()}%",
-                                        style: const TextStyle(fontSize: 12),
+                                      child: const Icon(
+                                        Icons.play_arrow,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
-                                )
-                              ],
-                            ),
+                                ),
+                              ),
+                              Container(
+                                height: 400,
+                                margin: const EdgeInsets.only(top: 10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: _trimSlider(),
+                                ),
+                              ),
+                              ValueListenableBuilder(
+                                valueListenable: _isExporting,
+                                builder: (_, bool export, Widget? child) =>
+                                    AnimatedSize(
+                                  duration: kThemeAnimationDuration,
+                                  child: export ? child : null,
+                                ),
+                                child: AlertDialog(
+                                  title: ValueListenableBuilder(
+                                    valueListenable: _exportingProgress,
+                                    builder: (_, double value, __) => Text(
+                                      "Exporting video ${(value * 100).ceil()}%",
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         )
                       ],
@@ -286,6 +230,7 @@ class _VideoEditorState extends State<VideoEditor> {
       ),
     );
   }
+
   Widget _topNavBar() {
     return SafeArea(
       child: SizedBox(
@@ -316,18 +261,18 @@ class _VideoEditorState extends State<VideoEditor> {
                 tooltip: 'Rotate clockwise',
               ),
             ),
-            Expanded(
-              child: IconButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (context) => CropPage(controller: _controller),
-                  ),
-                ),
-                icon: const Icon(Icons.crop),
-                tooltip: 'Open crop screen',
-              ),
-            ),
+            // Expanded(
+            //   child: IconButton(
+            //     onPressed: () => Navigator.push(
+            //       context,
+            //       MaterialPageRoute<void>(
+            //         builder: (context) => CropPage(controller: _controller),
+            //       ),
+            //     ),
+            //     icon: const Icon(Icons.crop),
+            //     tooltip: 'Open crop screen',
+            //   ),
+            // ),
             const VerticalDivider(endIndent: 22, indent: 22),
             Expanded(
               child: PopupMenuButton(
@@ -362,7 +307,6 @@ class _VideoEditorState extends State<VideoEditor> {
         builder: (_, __) {
           final int duration = _controller.videoDuration.inSeconds;
           final double pos = _controller.trimPosition * duration;
-
           return Padding(
             padding: EdgeInsets.symmetric(horizontal: height / 4),
             child: Row(children: [
@@ -384,14 +328,9 @@ class _VideoEditorState extends State<VideoEditor> {
       Container(
         width: MediaQuery.of(context).size.width,
         margin: EdgeInsets.symmetric(vertical: height / 4),
-        child: TrimSlider(
+        child: SubtitleSlider(
           controller: _controller,
           height: height,
-          horizontalMargin: height / 4,
-          child: TrimTimeline(
-            controller: _controller,
-            padding: const EdgeInsets.only(top: 10),
-          ),
         ),
       )
     ];
