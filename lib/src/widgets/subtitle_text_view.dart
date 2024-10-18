@@ -3,16 +3,36 @@ import 'package:subtitle/subtitle.dart';
 import 'package:video_subtitle_editor/src/widgets/subtitle/style/subtitle_style.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
-class SubtitleTextView extends StatelessWidget {
+class SubtitleTextView extends StatefulWidget {
   const SubtitleTextView({
     required this.controller,
     this.subtitleStyle = const SubtitleStyle(),
     super.key,
     this.backgroundColor,
   });
+
   final SubtitleStyle subtitleStyle;
   final Color? backgroundColor;
   final VideoSubtitleController controller;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _SubtitleTextViewState();
+  }
+}
+class _SubtitleTextViewState extends State<SubtitleTextView> {
+  SubtitleStyle get subtitleStyle => widget.subtitleStyle;
+  VideoSubtitleController get controller => widget.controller;
+  Color? get backgroundColor => widget.backgroundColor;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(_update);
+  }
+  _update() {
+    setState(() {});
+  }
 
   TextStyle get _textStyle {
     return subtitleStyle.hasBorder
@@ -37,7 +57,7 @@ class SubtitleTextView extends StatelessWidget {
                 child: Container(
                   color: backgroundColor,
                   child: _TextContent(
-                    text:controller.currentSubtitle.data,
+                    text:controller.currentSubtitle?.data??"",
                     textStyle: _textStyle,
                   ),
                 ),
@@ -47,7 +67,7 @@ class SubtitleTextView extends StatelessWidget {
                   child: Container(
                     color: backgroundColor,
                     child: _TextContent(
-                      text:controller.currentSubtitle.data,
+                      text:controller.currentSubtitle?.data??"",
                       textStyle: TextStyle(
                         color: subtitleStyle.textColor,
                         fontSize: subtitleStyle.fontSize,
@@ -58,6 +78,8 @@ class SubtitleTextView extends StatelessWidget {
             ],
           );
   }
+
+
 }
 
 class _TextContent extends StatelessWidget {

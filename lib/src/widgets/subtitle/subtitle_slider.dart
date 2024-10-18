@@ -71,6 +71,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
       // update trim and video position
       print("UI:_scrollController.offset: ${_scrollController.offset}");
       _controllerSeekTo(_scrollController.offset);
+
     }
   }
 
@@ -82,6 +83,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     final to = widget.controller.videoDuration *
         (position / (_sliderWidth + _horizontalMargin * 2));
     print("UI:to: $to");
+    widget.subtitleController.seekTo(to);
     await widget.controller.video.seekTo(to);
   }
 
