@@ -167,62 +167,61 @@ class _VideoEditorState extends State<VideoEditor> {
                       children: [
                         _topNavBar(),
                         Expanded(
-                          child: Column(
+                          child: Stack(
+                            alignment: Alignment.center,
                             children: [
-                              Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  buildVideoView(_controller),
-                                  AnimatedBuilder(
-                                    animation: _controller.video,
-                                    builder: (_, __) => AnimatedOpacity(
-                                      opacity: _controller.isPlaying ? 0 : 1,
-                                      duration: kThemeAnimationDuration,
-                                      child: GestureDetector(
-                                        onTap: _controller.video.play,
-                                        child: Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Icons.play_arrow,
-                                            color: Colors.black,
-                                          ),
-                                        ),
+                              buildVideoView(_controller),
+                              AnimatedBuilder(
+                                animation: _controller.video,
+                                builder: (_, __) => AnimatedOpacity(
+                                  opacity: _controller.isPlaying ? 0 : 1,
+                                  duration: kThemeAnimationDuration,
+                                  child: GestureDetector(
+                                    onTap: _controller.video.play,
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.play_arrow,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                              Container(
-                                height: 300,
-                                margin: const EdgeInsets.only(top: 10),
-                                child:SubtitleSlider(
-                                      controller: _controller,
-                                      height: height,
-                                    ),
-                              ),
-                              ValueListenableBuilder(
-                                valueListenable: _isExporting,
-                                builder: (_, bool export, Widget? child) =>
-                                    AnimatedSize(
-                                  duration: kThemeAnimationDuration,
-                                  child: export ? child : null,
                                 ),
-                                child: AlertDialog(
-                                  title: ValueListenableBuilder(
-                                    valueListenable: _exportingProgress,
-                                    builder: (_, double value, __) => Text(
-                                      "Exporting video ${(value * 100).ceil()}%",
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                              )
+                              ),
                             ],
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child:  Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            child: SubtitleSlider(
+                              controller: _controller,
+                              height: height,
+                            ),
+                          ),
+                        ),
+
+                        ValueListenableBuilder(
+                          valueListenable: _isExporting,
+                          builder: (_, bool export, Widget? child) =>
+                              AnimatedSize(
+                            duration: kThemeAnimationDuration,
+                            child: export ? child : null,
+                          ),
+                          child: AlertDialog(
+                            title: ValueListenableBuilder(
+                              valueListenable: _exportingProgress,
+                              builder: (_, double value, __) => Text(
+                                "Exporting video ${(value * 100).ceil()}%",
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
                           ),
                         )
                       ],
@@ -238,7 +237,7 @@ class _VideoEditorState extends State<VideoEditor> {
   Widget _topNavBar() {
     return SafeArea(
       child: SizedBox(
-        height: height,
+        height: 100,
         child: Row(
           children: [
             Expanded(
@@ -330,7 +329,6 @@ class _VideoEditorState extends State<VideoEditor> {
           );
         },
       ),
-
     ];
   }
 }

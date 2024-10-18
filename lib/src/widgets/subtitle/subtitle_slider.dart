@@ -28,7 +28,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
 
   /// The max width of [SubtitleSlider]
   double _sliderWidth = 1.0;
-  static const double perPixelInSec = 10.0;
+  static const double perPixelInSec = 100.0;
   late final ScrollController _scrollController;
   final Size _layout = Size.zero;
   late Size _maxLayout = _calculateMaxLayout();
@@ -49,7 +49,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   calculateSliderWidth(VideoEditorController controller) {
     final duration = controller.videoDuration.inSeconds;
     _sliderWidth = duration.toDouble() * perPixelInSec;
-    print("_sliderWidth: $_sliderWidth");
+    print("UI:_sliderWidth: $_sliderWidth");
   }
 
   @override
@@ -66,8 +66,9 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
 
   void attachScroll() {
     if (_scrollController.position.isScrollingNotifier.value) {
-      print("attachTrimToScroll called offset: ${_scrollController.offset}");
+      // print("attachTrimToScroll called offset: ${_scrollController.offset}");
       // update trim and video position
+      print("UI:_scrollController.offset: ${_scrollController.offset}");
       _controllerSeekTo(_scrollController.offset);
     }
   }
@@ -78,10 +79,9 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   /// If the expected position is bigger than [controller.endTrim], set it to [controller.endTrim]
   void _controllerSeekTo(double position) async {
     final to = widget.controller.videoDuration *
-        ((position + _scrollController.offset) /
-            (_sliderWidth + _horizontalMargin * 2));
-    await widget.controller.video.seekTo(
-        to > widget.controller.endTrim ? widget.controller.endTrim : to);
+        (position / (_sliderWidth + _horizontalMargin * 2));
+    print("UI:to: $to");
+    await widget.controller.video.seekTo(to);
   }
 
   Stream<List<Subtitle>> _generateSubtitles() =>
@@ -130,7 +130,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             stream: _stream,
             builder: (_, snapshot) {
               final data = snapshot.data;
-              print("snapshot.hasData: ${snapshot.hasData}");
               if (data == null) return const SizedBox();
               return snapshot.hasData
                   ? Padding(
