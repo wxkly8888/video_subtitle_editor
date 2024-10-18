@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:video_subtitle_editor/src/controller.dart';
+import 'package:video_subtitle_editor/src/video_controller.dart';
 import 'package:video_subtitle_editor/src/utils/helpers.dart';
 import 'package:video_subtitle_editor/src/models/transform_data.dart';
 import 'package:video_subtitle_editor/src/widgets/crop/crop_mixin.dart';
@@ -37,7 +37,7 @@ class CropGridViewer extends StatefulWidget {
   }) : showGrid = true;
 
   /// The [controller] param is mandatory so every change in the controller settings will propagate in the crop view
-  final VideoEditorController controller;
+  final VideoEditController controller;
 
   /// The [showGrid] param specifies whether the crop action can be triggered and if the crop grid is shown.
   /// Set this param to `false` to display the preview of the cropped video
@@ -61,7 +61,7 @@ class CropGridViewer extends StatefulWidget {
 class _CropGridViewerState extends State<CropGridViewer> with CropPreviewMixin {
   CropBoundaries _boundary = CropBoundaries.none;
 
-  late VideoEditorController _controller;
+  late VideoEditController _controller;
 
   /// Minimum size of the cropped area
   late final double minRectSize = _controller.cropStyle.boundariesLength * 2;

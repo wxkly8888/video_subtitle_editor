@@ -27,17 +27,18 @@ const Offset minOffset = Offset.zero;
 
 /// Provides an easy way to change edition parameters to apply in the different widgets of the package and at the exportion
 /// This controller allows to : rotate, crop, trim, cover generation and exportation (video and cover)
-class VideoEditorController extends ChangeNotifier {
+class VideoEditController extends ChangeNotifier {
 
 
   /// Video from [File].
   final File file;
   /// Style for [CropGridViewer]
   final CropGridStyle cropStyle;
-  /// Constructs a [VideoEditorController] that edits a video from a file.
+
+  /// Constructs a [VideoEditController] that edits a video from a file.
   ///
   /// The [file] argument must not be null.
-  VideoEditorController.file(
+  VideoEditController.file(
     this.file, {
     this.maxDuration = Duration.zero,
     this.minDuration = Duration.zero,

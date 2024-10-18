@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:video_subtitle_editor/src/controller.dart';
+import 'package:video_subtitle_editor/src/video_controller.dart';
 import 'package:video_subtitle_editor/src/utils/helpers.dart';
 
 
@@ -34,7 +34,7 @@ class TransformData {
     // the maximum size to display
     Size maxSize,
     // if controller is not provided, rotation is set to default (0)
-    VideoEditorController? controller,
+    VideoEditController? controller,
   ) {
     if (controller != null && controller.isRotated) {
       maxSize = maxSize.flipped;
@@ -54,7 +54,7 @@ class TransformData {
     );
   }
 
-  factory TransformData.fromController(VideoEditorController controller) {
+  factory TransformData.fromController(VideoEditController controller) {
     return TransformData(
       rotation: -controller.cacheRotation * (pi / 180.0),
       scale: 1.0,

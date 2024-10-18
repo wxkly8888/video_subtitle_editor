@@ -42,7 +42,7 @@ class _VideoEditorExampleState extends State<VideoEditorExample> {
       Navigator.push(
         context,
         MaterialPageRoute<void>(
-          builder: (BuildContext context) => VideoEditor(file: File(file.path)),
+          builder: (BuildContext context) => VideoEditor(videoFile: File(file.path)),
         ),
       );
     }
@@ -72,9 +72,9 @@ class _VideoEditorExampleState extends State<VideoEditorExample> {
 //VIDEO EDITOR SCREEN//
 //-------------------//
 class VideoEditor extends StatefulWidget {
-  const VideoEditor({super.key, required this.file});
+  const VideoEditor({super.key, required this.videoFile});
 
-  final File file;
+  final File videoFile;
 
   @override
   State<VideoEditor> createState() => _VideoEditorState();
@@ -84,9 +84,9 @@ class _VideoEditorState extends State<VideoEditor> {
   final _exportingProgress = ValueNotifier<double>(0.0);
   final _isExporting = ValueNotifier<bool>(false);
   final double height = 200;
-
-  late final VideoEditorController _controller = VideoEditorController.file(
-    widget.file,
+  late final VideoSubtitleController _subtitleController = VideoSubtitleController();
+  late final VideoEditController _controller = VideoEditController.file(
+    widget.videoFile,
   );
 
   @override
@@ -99,7 +99,8 @@ class _VideoEditorState extends State<VideoEditor> {
       // handle minumum duration bigger than video duration error
       Navigator.pop(context);
     }, test: (e) => e is VideoMinDurationError);
-
+    var path = 'assets/test.srt';
+    _subtitleController.initialize(path);
     // print("srt data:$data");
   }
 
@@ -170,7 +171,7 @@ class _VideoEditorState extends State<VideoEditor> {
                           child: Stack(
                             alignment: Alignment.center,
                             children: [
-                              buildVideoView(_controller),
+                              buildVideoView(_controller, _subtitleController),
                               AnimatedBuilder(
                                 animation: _controller.video,
                                 builder: (_, __) => AnimatedOpacity(
@@ -202,6 +203,7 @@ class _VideoEditorState extends State<VideoEditor> {
                             margin: const EdgeInsets.only(top: 10),
                             child: SubtitleSlider(
                               controller: _controller,
+                              subtitleController: _subtitleController,
                               height: height,
                             ),
                           ),
@@ -264,18 +266,6 @@ class _VideoEditorState extends State<VideoEditor> {
                 tooltip: 'Rotate clockwise',
               ),
             ),
-            // Expanded(
-            //   child: IconButton(
-            //     onPressed: () => Navigator.push(
-            //       context,
-            //       MaterialPageRoute<void>(
-            //         builder: (context) => CropPage(controller: _controller),
-            //       ),
-            //     ),
-            //     icon: const Icon(Icons.crop),
-            //     tooltip: 'Open crop screen',
-            //   ),
-            // ),
             const VerticalDivider(endIndent: 22, indent: 22),
             Expanded(
               child: PopupMenuButton(
@@ -298,10 +288,14 @@ class _VideoEditorState extends State<VideoEditor> {
   /// Returns the [VideoViewer] tranformed with editing view
   /// Paint rect on top of the video area outside of the crop rect
   Widget buildVideoView(
-    VideoEditorController controller,
+    VideoEditController videoController,
+    VideoSubtitleController subtitleController
   ) {
     return VideoViewer(
-      controller: controller,
+      controller: videoController,
+      child: SubtitleTextView(
+        controller: subtitleController,
+      ),
     );
   }
 
@@ -309,26 +303,4 @@ class _VideoEditorState extends State<VideoEditor> {
         duration.inMinutes.remainder(60).toString().padLeft(2, '0'),
         duration.inSeconds.remainder(60).toString().padLeft(2, '0')
       ].join(":");
-
-  List<Widget> _trimSlider() {
-    return [
-      AnimatedBuilder(
-        animation: Listenable.merge([
-          _controller,
-          _controller.video,
-        ]),
-        builder: (_, __) {
-          final int duration = _controller.videoDuration.inSeconds;
-          final double pos = _controller.trimPosition * duration;
-          return Padding(
-            padding: EdgeInsets.symmetric(horizontal: height / 4),
-            child: Row(children: [
-              Text(formatter(Duration(seconds: pos.toInt()))),
-              const Expanded(child: SizedBox()),
-            ]),
-          );
-        },
-      ),
-    ];
-  }
 }

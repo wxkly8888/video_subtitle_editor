@@ -84,7 +84,7 @@ double scaleToSizeMax(Size layout, Rect rect) =>
 /// Calculate crop [Rect] area
 /// depending of [controller] min and max crop values and the size of the layout
 Rect calculateCroppedRect(
-  VideoEditorController controller,
+  VideoEditController controller,
   Size layout, {
   Offset? min,
   Offset? max,

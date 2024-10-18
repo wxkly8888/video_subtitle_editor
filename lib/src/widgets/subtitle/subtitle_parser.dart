@@ -5,7 +5,7 @@ import '../../utils/asset_subtitle.dart';
 import '../../utils/mysubtitle_controller.dart';
 
 Stream<List<Subtitle>> generateSubtitles(
-    VideoEditorController controller) async* {
+    VideoEditController controller) async* {
   print("generateSubtitles called");
   var path = 'assets/test.srt';
   var controller = MySubtitleController(

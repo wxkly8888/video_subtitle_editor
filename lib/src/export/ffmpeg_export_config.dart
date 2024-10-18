@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:video_subtitle_editor/src/controller.dart';
+import 'package:video_subtitle_editor/src/video_controller.dart';
 import 'package:video_subtitle_editor/src/models/file_format.dart';
 
 class FFmpegVideoEditorExecute {
@@ -19,7 +19,7 @@ class FFmpegVideoEditorExecute {
 }
 
 abstract class FFmpegVideoEditorConfig {
-  final VideoEditorController controller;
+  final VideoEditController controller;
 
   /// If the [name] is `null`, then it uses this video filename.
   final String? name;

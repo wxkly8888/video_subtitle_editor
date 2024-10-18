@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:subtitle/subtitle.dart';
-import 'package:video_subtitle_editor/src/controller.dart';
+import 'package:video_subtitle_editor/src/subtitle_controller.dart';
+import 'package:video_subtitle_editor/src/video_controller.dart';
 import 'package:video_subtitle_editor/src/utils/helpers.dart';
-import 'package:video_subtitle_editor/src/widgets/subtitle/subtitle_parser.dart';
 
 class SubtitleSlider extends StatefulWidget {
   const SubtitleSlider({
     super.key,
     required this.controller,
+    required this.subtitleController,
     this.height = 60,
     this.horizontalMargin = 20,
   });
-
+  final VideoSubtitleController subtitleController;
   final double horizontalMargin;
 
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
 
-  final VideoEditorController controller;
+  final VideoEditController controller;
 
   @override
   State<SubtitleSlider> createState() => _SubtitleSliderState();
@@ -33,7 +34,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   final Size _layout = Size.zero;
   late Size _maxLayout = _calculateMaxLayout();
   late double _horizontalMargin;
-  late final Stream<List<Subtitle>> _stream = (() => _generateSubtitles())();
+  late final Stream<List<Subtitle>> _stream = (() => getSubtitles())();
 
   @override
   void initState() {
@@ -46,7 +47,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     _scrollController.addListener(attachScroll);
   }
 
-  calculateSliderWidth(VideoEditorController controller) {
+  calculateSliderWidth(VideoEditController controller) {
     final duration = controller.videoDuration.inSeconds;
     _sliderWidth = duration.toDouble() * perPixelInSec;
     print("UI:_sliderWidth: $_sliderWidth");
@@ -84,8 +85,9 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     await widget.controller.video.seekTo(to);
   }
 
-  Stream<List<Subtitle>> _generateSubtitles() =>
-      generateSubtitles(widget.controller);
+  Stream<List<Subtitle>> getSubtitles() {
+    return Stream.value(widget.subtitleController.subtitles);
+  }
 
   /// Returns the max size the layout should take with the rect value
   Size _calculateMaxLayout() {
@@ -130,6 +132,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             stream: _stream,
             builder: (_, snapshot) {
               final data = snapshot.data;
+              print("UI:data: $data");
               if (data == null) return const SizedBox();
               return snapshot.hasData
                   ? Padding(

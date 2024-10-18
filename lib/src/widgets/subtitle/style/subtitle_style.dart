@@ -9,7 +9,7 @@ class SubtitleStyle {
     this.hasBorder = false,
     this.borderStyle = const SubtitleBorderStyle(),
     this.fontSize = _defaultFontSize,
-    this.textColor = Colors.black,
+    this.textColor = Colors.white,
     this.position = const SubtitlePosition(),
   });
   final bool hasBorder;

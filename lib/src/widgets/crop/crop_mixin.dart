@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:video_subtitle_editor/src/controller.dart';
+import 'package:video_subtitle_editor/src/video_controller.dart';
 import 'package:video_subtitle_editor/src/utils/helpers.dart';
 import 'package:video_subtitle_editor/src/models/transform_data.dart';
 import 'package:video_subtitle_editor/src/widgets/crop/crop_grid.dart';
@@ -27,7 +27,7 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
   /// Returns the size of the max crop dimension based on available space and
   /// original video aspect ratio
   Size computeLayout(
-    VideoEditorController controller, {
+    VideoEditController controller, {
     EdgeInsets margin = EdgeInsets.zero,
     bool shouldFlipped = false,
   }) {
@@ -50,7 +50,7 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
   /// Returns the [VideoViewer] tranformed with editing view
   /// Paint rect on top of the video area outside of the crop rect
   Widget buildVideoView(
-    VideoEditorController controller,
+    VideoEditController controller,
     TransformData transform,
     CropBoundaries boundary, {
     bool showGrid = false,
@@ -96,7 +96,7 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
   // }
 
   Widget buildPaint(
-    VideoEditorController controller, {
+    VideoEditController controller, {
     CropBoundaries? boundary,
     bool showGrid = false,
     bool showCenterRects = false,
