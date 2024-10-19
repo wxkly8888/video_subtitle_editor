@@ -109,23 +109,23 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                   ? Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: _horizontalMargin),
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            20,
+                      child: Column(children: [
+                        CustomPaint(
+                          size: Size(_sliderWidth, 30),
+                          // Specify the size of the canvas
+                          painter: ScalePainter(
+                            tickCount:
+                                widget.controller.videoDuration.inSeconds,
                           ),
-                          child: Column(children: [
-                            CustomPaint(
-                              size: Size(_sliderWidth, 30),
-                              // Specify the size of the canvas
-                              painter: ScalePainter(
-                                tickCount:
-                                    widget.controller.videoDuration.inSeconds,
-                              ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              20,
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
+                            child: Container(
                                 height: widget.height + 20,
                                 width: _sliderWidth + 20,
                                 color: Colors.grey.withOpacity(0.2),
@@ -158,8 +158,8 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                           ),
                                         ));
                                   })
-                                ]))
-                          ])))
+                                ])))
+                      ]))
                   : const SizedBox();
             },
           );

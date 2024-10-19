@@ -93,9 +93,14 @@ class _VideoEditorState extends State<VideoEditor> {
     super.initState();
     _controller
         .initialize()
-        .then((_) => setState(() {}))
-        .catchError((error) {
-    });
+        .then((_) =>
+        setState(() {}))
+        .catchError((error) {});
+    _controller.addListener(
+      () {
+        setState(() {});
+      },
+    );
   }
 
   @override
@@ -150,6 +155,8 @@ class _VideoEditorState extends State<VideoEditor> {
 
   @override
   Widget build(BuildContext context) {
+    print("video width: ${_controller.videoWidth}, video height: ${_controller.videoHeight}");
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -162,41 +169,19 @@ class _VideoEditorState extends State<VideoEditor> {
                       children: [
                         _topNavBar(),
                         Expanded(
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
+                          child:
                               buildVideoView(_controller),
-                              AnimatedBuilder(
-                                animation: _controller.video,
-                                builder: (_, __) => AnimatedOpacity(
-                                  opacity: _controller.isPlaying ? 0 : 1,
-                                  duration: kThemeAnimationDuration,
-                                  child: GestureDetector(
-                                    onTap: _controller.video.play,
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.play_arrow,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
                         ),
-
-                       Container(
-                            margin: const EdgeInsets.only(top: 10,bottom: 50),
-                            child: SubtitleSlider(
-                              controller: _controller,
-                            ),
+                        Text(
+                          "${formatter(_controller.videoPosition)}/${formatter(_controller.videoDuration)}",
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 10, bottom: 50),
+                          child: SubtitleSlider(
+                            controller: _controller,
+                          ),
                         ),
                         ValueListenableBuilder(
                           valueListenable: _isExporting,
@@ -263,9 +248,9 @@ class _VideoEditorState extends State<VideoEditor> {
   Widget buildVideoView(VideoSubtitleController controller) {
     return VideoViewer(
       controller: controller,
-      child:SubtitleTextView(
+      child: SubtitleTextView(
         controller: controller,
-          ),
+      ),
     );
   }
 
