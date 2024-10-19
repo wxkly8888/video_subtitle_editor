@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:subtitle/subtitle.dart';
-import 'package:video_subtitle_editor/src/subtitle_controller.dart';
-import 'package:video_subtitle_editor/src/video_controller.dart';
-import 'package:video_subtitle_editor/src/utils/helpers.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
 class SubtitleSlider extends StatefulWidget {
