@@ -84,7 +84,6 @@ class VideoEditor extends StatefulWidget {
 class _VideoEditorState extends State<VideoEditor> {
   final _exportingProgress = ValueNotifier<double>(0.0);
   final _isExporting = ValueNotifier<bool>(false);
-  final double height = 200;
   late final VideoSubtitleController _controller = VideoSubtitleController.file(
     widget.videoFile,
   );
@@ -198,7 +197,6 @@ class _VideoEditorState extends State<VideoEditor> {
                             margin: const EdgeInsets.only(top: 10),
                             child: SubtitleSlider(
                               controller: _controller,
-                              height: height,
                             ),
                           ),
                         ),

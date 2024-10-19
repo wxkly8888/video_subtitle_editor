@@ -6,7 +6,7 @@ class SubtitleSlider extends StatefulWidget {
   const SubtitleSlider({
     super.key,
     required this.controller,
-    this.height = 60,
+    this.height = 100,
     this.horizontalMargin = 20,
   });
   final VideoSubtitleController controller;
@@ -14,7 +14,6 @@ class SubtitleSlider extends StatefulWidget {
 
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
-
 
   @override
   State<SubtitleSlider> createState() => _SubtitleSliderState();
@@ -27,7 +26,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   double _sliderWidth = 1.0;
   static const double perPixelInSec = 100.0;
   late final ScrollController _scrollController;
-  final Size _layout = Size.zero;
   late double _horizontalMargin;
   late final Stream<List<Subtitle>> _stream = (() => getSubtitles())();
 
@@ -37,7 +35,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     _horizontalMargin = widget.horizontalMargin;
     calculateSliderWidth(widget.controller);
     _scrollController = ScrollController();
-    //widget.controller.addListener(_updateTrim);
     _scrollController.addListener(attachScroll);
   }
 
@@ -52,8 +49,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     _rect.dispose();
     super.dispose();
   }
-
-
 
   void attachScroll() {
     if (_scrollController.position.isScrollingNotifier.value) {
@@ -107,7 +102,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             stream: _stream,
             builder: (_, snapshot) {
               final data = snapshot.data;
-              print("UI:data: $data");
               if (data == null) return const SizedBox();
               return snapshot.hasData
                   ? Padding(
@@ -117,37 +111,41 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                           borderRadius: BorderRadius.circular(
                             20,
                           ),
-                          child: SizedBox(
-                              height: widget.height,
-                              width: _sliderWidth,
+                          child: Container(
+                              height: widget.height+20,
+                              width: _sliderWidth+20,
+                              color: Colors.grey.withOpacity(0.5),
                               child: Stack(
-                                children: data.map((subtitle) {
+                                children: [
+                                  ...data.map((subtitle) {
                                   double width = computeWidth(subtitle);
                                   double startX = computeStartX(subtitle);
                                   return Positioned(
                                     left: startX,
-                                    child: SizedBox(
-                                      width: width,
-                                      height: 100,
-                                      child: Container(
+                                    top: 10,
+                                    child: Container(
+                                        width: width,
+                                        height: widget.height,
                                         decoration: BoxDecoration(
                                           color: const Color(0xFF974836),
                                           borderRadius:
-                                              BorderRadius.circular(5),
+                                          BorderRadius.circular(10),
                                         ),
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          subtitle.data,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            subtitle.data,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
+                                        )
                                   );
-                                }).toList(),
+                                })]
                               ))))
                   : const SizedBox();
             },
