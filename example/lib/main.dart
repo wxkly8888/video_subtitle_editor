@@ -42,7 +42,8 @@ class _VideoEditorExampleState extends State<VideoEditorExample> {
       Navigator.push(
         context,
         MaterialPageRoute<void>(
-          builder: (BuildContext context) => VideoEditor(videoFile: File(file.path)),
+          builder: (BuildContext context) =>
+              VideoEditor(videoFile: File(file.path)),
         ),
       );
     }
@@ -84,7 +85,8 @@ class _VideoEditorState extends State<VideoEditor> {
   final _exportingProgress = ValueNotifier<double>(0.0);
   final _isExporting = ValueNotifier<bool>(false);
   final double height = 200;
-  late final VideoSubtitleController _subtitleController = VideoSubtitleController();
+  late final VideoSubtitleController _subtitleController =
+      VideoSubtitleController();
   late final VideoEditController _controller = VideoEditController.file(
     widget.videoFile,
   );
@@ -199,7 +201,7 @@ class _VideoEditorState extends State<VideoEditor> {
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
-                          child:  Container(
+                          child: Container(
                             margin: const EdgeInsets.only(top: 10),
                             child: SubtitleSlider(
                               controller: _controller,
@@ -208,7 +210,6 @@ class _VideoEditorState extends State<VideoEditor> {
                             ),
                           ),
                         ),
-
                         ValueListenableBuilder(
                           valueListenable: _isExporting,
                           builder: (_, bool export, Widget? child) =>
@@ -287,15 +288,14 @@ class _VideoEditorState extends State<VideoEditor> {
 
   /// Returns the [VideoViewer] tranformed with editing view
   /// Paint rect on top of the video area outside of the crop rect
-  Widget buildVideoView(
-    VideoEditController videoController,
-    VideoSubtitleController subtitleController
-  ) {
+  Widget buildVideoView(VideoEditController videoController,
+      VideoSubtitleController subtitleController) {
     return VideoViewer(
       controller: videoController,
-      child: SubtitleTextView(
-        controller: subtitleController,
-      ),
+      child:SubtitleTextView(
+            videoController: videoController,
+            subtitleController: subtitleController,
+          ),
     );
   }
 

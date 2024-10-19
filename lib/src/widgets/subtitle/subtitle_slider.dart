@@ -78,7 +78,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   /// Scroll to update [_rect] and trim values on scroll
   /// Will fix [_rect] to the scroll view when it is bouncing
   /// Sets the video's current timestamp to be at the [position] on the slider
-  /// If the expected position is bigger than [controller.endTrim], set it to [controller.endTrim]
+  /// If the expected position is bigger than [subtitleController.endTrim], set it to [subtitleController.endTrim]
   void _controllerSeekTo(double position) async {
     final to = widget.controller.videoDuration *
         (position / (_sliderWidth + _horizontalMargin * 2));
