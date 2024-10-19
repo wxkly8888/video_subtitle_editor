@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_subtitle_editor/src/video_subtitle_controller.dart';
 
-import '../video_controller.dart';
 
 class VideoViewer extends StatelessWidget {
   const VideoViewer({super.key, required this.controller, this.child});
 
-  final VideoEditController controller;
+  final VideoSubtitleController controller;
   final Widget? child;
 
   @override

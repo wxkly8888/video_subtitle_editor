@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:video_subtitle_editor/src/widgets/subtitle/style/subtitle_border_style.dart';
-import 'package:video_subtitle_editor/src/widgets/subtitle/style/subtitle_position.dart';
+import 'package:video_subtitle_editor/src/widgets/style/subtitle_position.dart';
+
+import 'subtitle_border_style.dart';
 
 const _defaultFontSize = 16.0;
 

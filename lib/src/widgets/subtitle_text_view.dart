@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:video_subtitle_editor/src/widgets/subtitle/style/subtitle_style.dart';
+import 'package:video_subtitle_editor/src/widgets/style/subtitle_style.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
 class SubtitleTextView extends StatefulWidget {
   const SubtitleTextView({
-    required this.subtitleController,
-    required this.videoController,
+    required this.controller,
     this.subtitleStyle = const SubtitleStyle(),
     super.key,
     this.backgroundColor,
@@ -13,8 +12,7 @@ class SubtitleTextView extends StatefulWidget {
 
   final SubtitleStyle subtitleStyle;
   final Color? backgroundColor;
-  final VideoSubtitleController subtitleController;
-  final VideoEditController videoController;
+  final VideoSubtitleController controller;
 
   @override
   State<StatefulWidget> createState() {
@@ -25,29 +23,20 @@ class SubtitleTextView extends StatefulWidget {
 class _SubtitleTextViewState extends State<SubtitleTextView> {
   SubtitleStyle get subtitleStyle => widget.subtitleStyle;
 
-  VideoSubtitleController get subtitleController => widget.subtitleController;
+  VideoSubtitleController get videoSubtitleController => widget.controller;
 
-  VideoEditController get videoController => widget.videoController;
 
   Color? get backgroundColor => widget.backgroundColor;
 
   @override
   void initState() {
     super.initState();
-    subtitleController.addListener(_update);
-    videoController.video.addListener(_updateSubtitleFromVideo);
+    videoSubtitleController.addListener(_update);
   }
 
   _update() {
     setState(() {});
   }
-
-  _updateSubtitleFromVideo() {
-        final videoPlayerPosition = videoController.video.value.position;
-        print("UI: videoPlayerPosition: $videoPlayerPosition");
-        subtitleController.seekTo(videoPlayerPosition);
-  }
-
   TextStyle get _textStyle {
     return subtitleStyle.hasBorder
         ? TextStyle(
@@ -71,7 +60,7 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
           child: Container(
             color: backgroundColor,
             child: _TextContent(
-              text: subtitleController.currentSubtitle?.data ?? "",
+              text: videoSubtitleController.currentSubtitle?.data ?? "",
               textStyle: _textStyle,
             ),
           ),
@@ -81,7 +70,7 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
             child: Container(
               color: backgroundColor,
               child: _TextContent(
-                text: subtitleController.currentSubtitle?.data ?? "",
+                text: videoSubtitleController.currentSubtitle?.data ?? "",
                 textStyle: TextStyle(
                   color: subtitleStyle.textColor,
                   fontSize: subtitleStyle.fontSize,

@@ -17,7 +17,6 @@ class AssetSubtitle extends SubtitleProvider {
     // Preparing subtitle file data by reading the file.
     // final data = await rootBundle.loadString(path);
     final data =  await rootBundle.loadString(path);
-    print("srt data1111111:$data");
     // Find the current format type of subtitle.
     final ext = extension(path);
     final type = this.type ?? getSubtitleType(ext);

@@ -85,9 +85,7 @@ class _VideoEditorState extends State<VideoEditor> {
   final _exportingProgress = ValueNotifier<double>(0.0);
   final _isExporting = ValueNotifier<bool>(false);
   final double height = 200;
-  late final VideoSubtitleController _subtitleController =
-      VideoSubtitleController();
-  late final VideoEditController _controller = VideoEditController.file(
+  late final VideoSubtitleController _controller = VideoSubtitleController.file(
     widget.videoFile,
   );
 
@@ -95,15 +93,10 @@ class _VideoEditorState extends State<VideoEditor> {
   void initState() {
     super.initState();
     _controller
-        .initialize(aspectRatio: 9 / 16)
+        .initialize()
         .then((_) => setState(() {}))
         .catchError((error) {
-      // handle minumum duration bigger than video duration error
-      Navigator.pop(context);
-    }, test: (e) => e is VideoMinDurationError);
-    var path = 'assets/test.srt';
-    _subtitleController.initialize(path);
-    // print("srt data:$data");
+    });
   }
 
   @override
@@ -111,7 +104,7 @@ class _VideoEditorState extends State<VideoEditor> {
     _exportingProgress.dispose();
     _isExporting.dispose();
     _controller.dispose();
-    ExportService.dispose();
+    // ExportService.dispose();
     super.dispose();
   }
 
@@ -127,33 +120,33 @@ class _VideoEditorState extends State<VideoEditor> {
     _exportingProgress.value = 0;
     _isExporting.value = true;
 
-    final config = VideoFFmpegVideoEditorConfig(
-      _controller,
-      // format: VideoExportFormat.gif,
-      // commandBuilder: (config, videoPath, outputPath) {
-      //   final List<String> filters = config.getExportFilters();
-      //   filters.add('hflip'); // add horizontal flip
+    // final config = VideoFFmpegVideoEditorConfig(
+    //   _controller,
+    //   // format: VideoExportFormat.gif,
+    //   // commandBuilder: (config, videoPath, outputPath) {
+    //   //   final List<String> filters = config.getExportFilters();
+    //   //   filters.add('hflip'); // add horizontal flip
+    //
+    //   //   return '-i $videoPath ${config.filtersCmd(filters)} -preset ultrafast $outputPath';
+    //   // },
+    // );
 
-      //   return '-i $videoPath ${config.filtersCmd(filters)} -preset ultrafast $outputPath';
-      // },
-    );
-
-    await ExportService.runFFmpegCommand(
-      await config.getExecuteConfig(),
-      onProgress: (stats) {
-        _exportingProgress.value = config.getFFmpegProgress(stats.getTime());
-      },
-      onError: (e, s) => _showErrorSnackBar("Error on export video :("),
-      onCompleted: (file) {
-        _isExporting.value = false;
-        if (!mounted) return;
-
-        showDialog(
-          context: context,
-          builder: (_) => VideoResultPopup(video: file),
-        );
-      },
-    );
+    // await ExportService.runFFmpegCommand(
+    //   await config.getExecuteConfig(),
+    //   onProgress: (stats) {
+    //     _exportingProgress.value = config.getFFmpegProgress(stats.getTime());
+    //   },
+    //   onError: (e, s) => _showErrorSnackBar("Error on export video :("),
+    //   onCompleted: (file) {
+    //     _isExporting.value = false;
+    //     if (!mounted) return;
+    //
+    //     showDialog(
+    //       context: context,
+    //       builder: (_) => VideoResultPopup(video: file),
+    //     );
+    //   },
+    // );
   }
 
   @override
@@ -173,7 +166,7 @@ class _VideoEditorState extends State<VideoEditor> {
                           child: Stack(
                             alignment: Alignment.center,
                             children: [
-                              buildVideoView(_controller, _subtitleController),
+                              buildVideoView(_controller),
                               AnimatedBuilder(
                                 animation: _controller.video,
                                 builder: (_, __) => AnimatedOpacity(
@@ -205,7 +198,6 @@ class _VideoEditorState extends State<VideoEditor> {
                             margin: const EdgeInsets.only(top: 10),
                             child: SubtitleSlider(
                               controller: _controller,
-                              subtitleController: _subtitleController,
                               height: height,
                             ),
                           ),
@@ -242,29 +234,13 @@ class _VideoEditorState extends State<VideoEditor> {
       child: SizedBox(
         height: 100,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(Icons.exit_to_app),
                 tooltip: 'Leave editor',
-              ),
-            ),
-            const VerticalDivider(endIndent: 22, indent: 22),
-            Expanded(
-              child: IconButton(
-                onPressed: () =>
-                    _controller.rotate90Degrees(RotateDirection.left),
-                icon: const Icon(Icons.rotate_left),
-                tooltip: 'Rotate unclockwise',
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                onPressed: () =>
-                    _controller.rotate90Degrees(RotateDirection.right),
-                icon: const Icon(Icons.rotate_right),
-                tooltip: 'Rotate clockwise',
               ),
             ),
             const VerticalDivider(endIndent: 22, indent: 22),
@@ -288,13 +264,11 @@ class _VideoEditorState extends State<VideoEditor> {
 
   /// Returns the [VideoViewer] tranformed with editing view
   /// Paint rect on top of the video area outside of the crop rect
-  Widget buildVideoView(VideoEditController videoController,
-      VideoSubtitleController subtitleController) {
+  Widget buildVideoView(VideoSubtitleController controller) {
     return VideoViewer(
-      controller: videoController,
+      controller: controller,
       child:SubtitleTextView(
-            videoController: videoController,
-            subtitleController: subtitleController,
+        controller: controller,
           ),
     );
   }

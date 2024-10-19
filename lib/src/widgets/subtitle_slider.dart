@@ -3,22 +3,21 @@ import 'package:subtitle/subtitle.dart';
 import 'package:video_subtitle_editor/src/subtitle_controller.dart';
 import 'package:video_subtitle_editor/src/video_controller.dart';
 import 'package:video_subtitle_editor/src/utils/helpers.dart';
+import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
 class SubtitleSlider extends StatefulWidget {
   const SubtitleSlider({
     super.key,
     required this.controller,
-    required this.subtitleController,
     this.height = 60,
     this.horizontalMargin = 20,
   });
-  final VideoSubtitleController subtitleController;
+  final VideoSubtitleController controller;
   final double horizontalMargin;
 
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
 
-  final VideoEditController controller;
 
   @override
   State<SubtitleSlider> createState() => _SubtitleSliderState();
@@ -32,7 +31,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   static const double perPixelInSec = 100.0;
   late final ScrollController _scrollController;
   final Size _layout = Size.zero;
-  late Size _maxLayout = _calculateMaxLayout();
   late double _horizontalMargin;
   late final Stream<List<Subtitle>> _stream = (() => getSubtitles())();
 
@@ -41,13 +39,12 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     super.initState();
     _horizontalMargin = widget.horizontalMargin;
     calculateSliderWidth(widget.controller);
-    widget.controller.addListener(_scaleRect);
     _scrollController = ScrollController();
     //widget.controller.addListener(_updateTrim);
     _scrollController.addListener(attachScroll);
   }
 
-  calculateSliderWidth(VideoEditController controller) {
+  calculateSliderWidth(VideoSubtitleController controller) {
     final duration = controller.videoDuration.inSeconds;
     _sliderWidth = duration.toDouble() * perPixelInSec;
     print("UI:_sliderWidth: $_sliderWidth");
@@ -55,15 +52,11 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_scaleRect);
     _rect.dispose();
     super.dispose();
   }
 
-  void _scaleRect() {
-    _rect.value = calculateCroppedRect(widget.controller, _layout);
-    _maxLayout = _calculateMaxLayout();
-  }
+
 
   void attachScroll() {
     if (_scrollController.position.isScrollingNotifier.value) {
@@ -83,31 +76,14 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     final to = widget.controller.videoDuration *
         (position / (_sliderWidth + _horizontalMargin * 2));
     print("UI:to: $to");
-    widget.subtitleController.seekTo(to);
-    await widget.controller.video.seekTo(to);
+    await widget.controller.seekTo(to);
   }
 
   Stream<List<Subtitle>> getSubtitles() {
-    return Stream.value(widget.subtitleController.subtitles);
+    return Stream.value(widget.controller.subtitles);
   }
 
-  /// Returns the max size the layout should take with the rect value
-  Size _calculateMaxLayout() {
-    final ratio = _rect.value == Rect.zero
-        ? widget.controller.video.value.aspectRatio
-        : _rect.value.size.aspectRatio;
-
-    // check if the ratio is almost 1
-    if (isNumberAlmost(ratio, 1)) return Size.square(widget.height);
-
-    final size = Size(widget.height * ratio, widget.height);
-
-    if (widget.controller.isRotated) {
-      return Size(widget.height / ratio, widget.height);
-    }
-    return size;
-  }
-
+// Returns the max size the layout should take with the rect value
   double computeWidth(Subtitle subtitle) {
     final start = subtitle.start.inMilliseconds;
     final end = subtitle.end.inMilliseconds;
@@ -115,7 +91,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     final width = (_sliderWidth * (end - start)) / duration;
     return width;
   }
-
+// Returns the max size the layout should take with the rect value
   double computeStartX(Subtitle subtitle) {
     final start = subtitle.start.inMilliseconds;
     final duration = widget.controller.videoDuration.inMilliseconds;
