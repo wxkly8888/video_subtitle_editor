@@ -191,14 +191,12 @@ class _VideoEditorState extends State<VideoEditor> {
                             ],
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 10),
+
+                       Container(
+                            margin: const EdgeInsets.only(top: 10,bottom: 50),
                             child: SubtitleSlider(
                               controller: _controller,
                             ),
-                          ),
                         ),
                         ValueListenableBuilder(
                           valueListenable: _isExporting,

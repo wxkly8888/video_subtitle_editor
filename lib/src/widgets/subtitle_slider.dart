@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:subtitle/subtitle.dart';
+import 'package:video_subtitle_editor/src/widgets/scale_line.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
 class SubtitleSlider extends StatefulWidget {
@@ -9,6 +10,7 @@ class SubtitleSlider extends StatefulWidget {
     this.height = 100,
     this.horizontalMargin = 20,
   });
+
   final VideoSubtitleController controller;
   final double horizontalMargin;
 
@@ -56,7 +58,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
       // update trim and video position
       print("UI:_scrollController.offset: ${_scrollController.offset}");
       _controllerSeekTo(_scrollController.offset);
-
     }
   }
 
@@ -83,6 +84,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     final width = (_sliderWidth * (end - start)) / duration;
     return width;
   }
+
 // Returns the max size the layout should take with the rect value
   double computeStartX(Subtitle subtitle) {
     final start = subtitle.start.inMilliseconds;
@@ -111,42 +113,53 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                           borderRadius: BorderRadius.circular(
                             20,
                           ),
-                          child: Container(
-                              height: widget.height+20,
-                              width: _sliderWidth+20,
-                              color: Colors.grey.withOpacity(0.5),
-                              child: Stack(
-                                children: [
+                          child: Column(children: [
+                            CustomPaint(
+                              size: Size(_sliderWidth, 30),
+                              // Specify the size of the canvas
+                              painter: ScalePainter(
+                                tickCount:
+                                    widget.controller.videoDuration.inSeconds,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                                height: widget.height + 20,
+                                width: _sliderWidth + 20,
+                                color: Colors.grey.withOpacity(0.2),
+                                child: Stack(children: [
                                   ...data.map((subtitle) {
-                                  double width = computeWidth(subtitle);
-                                  double startX = computeStartX(subtitle);
-                                  return Positioned(
-                                    left: startX,
-                                    top: 10,
-                                    child: Container(
-                                        width: width,
-                                        height: widget.height,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF974836),
-                                          borderRadius:
-                                          BorderRadius.circular(10),
-                                        ),
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            subtitle.data,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+                                    double width = computeWidth(subtitle);
+                                    double startX = computeStartX(subtitle);
+                                    return Positioned(
+                                        left: startX,
+                                        top: 10,
+                                        child: Container(
+                                          width: width,
+                                          height: widget.height,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF974836),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              subtitle.data,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        )
-                                  );
-                                })]
-                              ))))
+                                        ));
+                                  })
+                                ]))
+                          ])))
                   : const SizedBox();
             },
           );
