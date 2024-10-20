@@ -18,8 +18,8 @@ class VideoSubtitleController extends ChangeNotifier {
 
   List<Subtitle> get subtitles => _subtitles;
 
-  Subtitle? subtitle;
-  get currentSubtitle => subtitle;
+  Subtitle? _subtitle;
+  get currentSubtitle => _subtitle;
 
   Subtitle? highlightSubtitle;
 
@@ -53,8 +53,33 @@ class VideoSubtitleController extends ChangeNotifier {
     Platform.isIOS ? Uri.encodeFull(videoFile.path) : videoFile.path,
   ));
 
+ ///get a pre subtitle of current subtitle
+  ///if current subtitle is null, return null
+  Subtitle? getPreSubtitle() {
+    if(_subtitle == null) {
+      return null;
+    }
+    int index = _subtitles.indexOf(_subtitle!);
+    if(index == 0) {
+      return null;
+    }
+    return _subtitles[index - 1];
+  }
+  ///get a next subtitle of current subtitle
+  ///if current subtitle is null, return null
+  ///if current subtitle is the last subtitle, return null
+  Subtitle? getNextSubtitle() {
+    if(_subtitle == null) {
+      return null;
+    }
+    int index = _subtitles.indexOf(_subtitle!);
+    if(index == _subtitles.length - 1) {
+      return null;
+    }
+    return _subtitles[index + 1];
+  }
 
-
+  ///get a subtitle from a timestamp
   getSubtitleFromTimeStamp(Duration timestamp) {
     for(int i = 0; i < _subtitles.length; i++) {
       if(_subtitles[i].start <= timestamp && _subtitles[i].end >= timestamp) {
@@ -82,7 +107,7 @@ class VideoSubtitleController extends ChangeNotifier {
   }
 
   void seekSubtitleTo(Duration timestamp) {
-    subtitle = getSubtitleFromTimeStamp(timestamp);
+    _subtitle = getSubtitleFromTimeStamp(timestamp);
     notifyListeners();
   }
    seekTo(Duration timestamp) async{

@@ -74,7 +74,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   void _controllerSeekTo(double position) async {
     final to = widget.controller.videoDuration *
         (position / (_sliderWidth + _horizontalMargin * 2));
-    print("UI:to: $to");
     await widget.controller.seekTo(to);
   }
 
@@ -146,7 +145,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                           touchHeight / 2,
                                       child: GestureDetector(
                                           onHorizontalDragUpdate: (details) {
-                                            adjustSubtitle(true, details);
+                                            adjustSubtitleStartTime(details);
                                             setState(() {});
                                           },
                                           child: Container(
@@ -177,7 +176,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                           touchHeight / 2,
                                       child: GestureDetector(
                                           onHorizontalDragUpdate: (details) {
-                                            adjustSubtitle(true, details);
+                                            adjustSubtitleEndTime(details);
                                             setState(() {});
                                           },
                                           child: Container(
@@ -220,18 +219,42 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
         : 0.0;
   }
 
-  adjustSubtitle(bool adjustStart, DragUpdateDetails details) {
-    print("onHorizontalDragUpdate 1: ${details.primaryDelta}");
-    print("onHorizontalDragUpdate 2: ${details.globalPosition}");
-    final to = widget.controller.videoDuration *
-        (details.globalPosition.dx / (_sliderWidth + _horizontalMargin * 2));
+  /// Adjust the subtitle start time based on the drag details
+  /// @param details: the drag details
+  adjustSubtitleStartTime(DragUpdateDetails details) {
+    if (widget.controller.highlightSubtitle == null) return;
+    double offsetX =
+        (details.primaryDelta ?? 0) / (_sliderWidth + _horizontalMargin * 2);
+    final to = widget.controller.videoDuration * offsetX;
     if (widget.controller.highlightSubtitle != null) {
-      if (adjustStart) {
-        widget.controller.highlightSubtitle!.start -= to;
-      } else {
-        widget.controller.highlightSubtitle!.end += to;
-      }
-      print("UI:highlightSubtitle: ${widget.controller.highlightSubtitle}");
+        var adjustStartX = widget.controller.highlightSubtitle!.start - to;
+        //check if start time is less than pre subtitle end time
+        if (adjustStartX <=
+            (widget.controller.getPreSubtitle()?.end ??
+                const Duration(seconds: 0))) {
+          adjustStartX = widget.controller.getPreSubtitle()?.end ??
+              const Duration(seconds: 0);
+        }
+        widget.controller.highlightSubtitle!.start = adjustStartX;
+    }
+  }
+  /// Adjust the subtitle end time based on the drag details
+  /// @param details: the drag details
+  adjustSubtitleEndTime(DragUpdateDetails details) {
+    if (widget.controller.highlightSubtitle == null) return;
+    double offsetX =
+        (details.primaryDelta ?? 0) / (_sliderWidth + _horizontalMargin * 2);
+    final to = widget.controller.videoDuration * offsetX;
+    if (widget.controller.highlightSubtitle != null) {
+        var adjustEndX = widget.controller.highlightSubtitle!.end + to;
+        //check if end time is greater than next subtitle start time
+        if (adjustEndX >=
+            (widget.controller.getNextSubtitle()?.start ??
+                widget.controller.videoDuration)) {
+          adjustEndX = widget.controller.getNextSubtitle()?.start ??
+              widget.controller.videoDuration;
+        }
+        widget.controller.highlightSubtitle!.end = adjustEndX;
     }
   }
 
