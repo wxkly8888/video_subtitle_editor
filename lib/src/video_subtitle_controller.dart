@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:subtitle/subtitle.dart';
 import 'package:video_player/video_player.dart';
-import 'package:video_subtitle_editor/src/utils/asset_subtitle.dart';
+import 'package:video_subtitle_editor/src/utils/subtitle/asset_subtitle.dart';
 import 'package:video_subtitle_editor/src/utils/mysubtitle_controller.dart';
+
+import 'models/subtitle.dart';
 
 class VideoSubtitleController extends ChangeNotifier {
 
@@ -19,6 +20,8 @@ class VideoSubtitleController extends ChangeNotifier {
 
   Subtitle? subtitle;
   get currentSubtitle => subtitle;
+
+  Subtitle? highlightSubtitle;
 
   /// Get the [VideoPlayerController]
   VideoPlayerController get video => _video;

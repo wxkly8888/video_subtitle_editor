@@ -155,8 +155,6 @@ class _VideoEditorState extends State<VideoEditor> {
 
   @override
   Widget build(BuildContext context) {
-    print("video width: ${_controller.videoWidth}, video height: ${_controller.videoHeight}");
-
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(

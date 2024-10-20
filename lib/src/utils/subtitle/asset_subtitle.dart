@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
-import 'package:subtitle/subtitle.dart';
+
+import 'subtitle_provider.dart';
+import 'types.dart';
 
 class AssetSubtitle extends SubtitleProvider {
   /// The subtitle path in your assets.

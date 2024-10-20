@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:subtitle/subtitle.dart';
+import 'package:video_subtitle_editor/src/models/subtitle.dart';
 import 'package:video_subtitle_editor/src/widgets/scale_line.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
@@ -27,9 +27,14 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   /// The max width of [SubtitleSlider]
   double _sliderWidth = 1.0;
   static const double perPixelInSec = 100.0;
+  static const double touchWidth = 30.0;
+  static const double touchHeight = 60.0;
+
   late final ScrollController _scrollController;
   late double _horizontalMargin;
   late final Stream<List<Subtitle>> _stream = (() => getSubtitles())();
+
+  bool isHighlighted = false;
 
   @override
   void initState() {
@@ -57,6 +62,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
       // print("attachTrimToScroll called offset: ${_scrollController.offset}");
       // update trim and video position
       print("UI:_scrollController.offset: ${_scrollController.offset}");
+      isHighlighted = false;
       _controllerSeekTo(_scrollController.offset);
     }
   }
@@ -105,64 +111,173 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             builder: (_, snapshot) {
               final data = snapshot.data;
               if (data == null) return const SizedBox();
-              return snapshot.hasData
-                  ? Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: _horizontalMargin),
-                      child: Column(children: [
-                        CustomPaint(
-                          size: Size(_sliderWidth, 30),
-                          // Specify the size of the canvas
-                          painter: ScalePainter(
-                            tickCount:
-                                widget.controller.videoDuration.inSeconds,
-                          ),
+
+              return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: _horizontalMargin),
+                  child: Column(children: [
+                    CustomPaint(
+                      size: Size(_sliderWidth, 30),
+                      // Specify the size of the canvas
+                      painter: ScalePainter(
+                        tickCount: widget.controller.videoDuration.inSeconds,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          20,
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              20,
-                            ),
-                            child: Container(
-                                height: widget.height + 20,
-                                width: _sliderWidth + 20,
-                                color: Colors.grey.withOpacity(0.2),
-                                child: Stack(children: [
-                                  ...data.map((subtitle) {
-                                    double width = computeWidth(subtitle);
-                                    double startX = computeStartX(subtitle);
-                                    return Positioned(
-                                        left: startX,
-                                        top: 10,
-                                        child: Container(
-                                          width: width,
-                                          height: widget.height,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF974836),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              subtitle.data,
-                                              style: const TextStyle(
+                        child: Container(
+                            height: widget.height + 20,
+                            width: _sliderWidth + 20,
+                            color: Colors.grey.withOpacity(0.2),
+                            child: Stack(children: [
+                              ...data.map((subtitle) {
+                                return _buildSingleSubtitle(subtitle);
+                              }),
+                              Visibility(
+                                  visible: isHighlighted,
+                                  child: Positioned(
+                                      left: _calculateLeftTouch(),
+                                      top: 10 +
+                                          widget.height / 2 -
+                                          touchHeight / 2,
+                                      child: GestureDetector(
+                                          onHorizontalDragUpdate: (details) {
+                                            adjustSubtitle(true, details);
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: touchWidth,
+                                            height: touchHeight,
+                                            decoration: const BoxDecoration(
+                                                color: Colors.green,
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(10),
+                                                    bottomLeft:
+                                                        Radius.circular(10))),
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: const Align(
+                                              alignment: Alignment.center,
+                                              child: Icon(
+                                                Icons.arrow_back_ios_rounded,
                                                 color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                          ),
-                                        ));
-                                  })
-                                ])))
-                      ]))
-                  : const SizedBox();
+                                          )))),
+                              Visibility(
+                                  visible: isHighlighted,
+                                  child: Positioned(
+                                      left: _calculateRightTouch(),
+                                      top: 10 +
+                                          widget.height / 2 -
+                                          touchHeight / 2,
+                                      child: GestureDetector(
+                                          onHorizontalDragUpdate: (details) {
+                                            adjustSubtitle(true, details);
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: touchWidth,
+                                            height: touchHeight,
+                                            decoration: const BoxDecoration(
+                                                color: Colors.green,
+                                                borderRadius: BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(10),
+                                                    bottomRight:
+                                                        Radius.circular(10))),
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: const Align(
+                                              alignment: Alignment.center,
+                                              child: Icon(
+                                                Icons.arrow_forward_ios_rounded,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          )))),
+                            ])))
+                  ]));
             },
           );
         }));
+  }
+
+  double _calculateLeftTouch() {
+    print("_calculateLeftTouch called");
+    return widget.controller.highlightSubtitle != null
+        ? computeStartX(widget.controller.highlightSubtitle!) - touchWidth
+        : 0.0;
+  }
+
+  double _calculateRightTouch() {
+    return widget.controller.highlightSubtitle != null
+        ? computeStartX(widget.controller.highlightSubtitle!) +
+            computeWidth(widget.controller.highlightSubtitle!)
+        : 0.0;
+  }
+
+  adjustSubtitle(bool adjustStart, DragUpdateDetails details) {
+    print("onHorizontalDragUpdate 1: ${details.primaryDelta}");
+    print("onHorizontalDragUpdate 2: ${details.globalPosition}");
+    final to = widget.controller.videoDuration *
+        (details.globalPosition.dx / (_sliderWidth + _horizontalMargin * 2));
+    if (widget.controller.highlightSubtitle != null) {
+      if (adjustStart) {
+        widget.controller.highlightSubtitle!.start -= to;
+      } else {
+        widget.controller.highlightSubtitle!.end += to;
+      }
+      print("UI:highlightSubtitle: ${widget.controller.highlightSubtitle}");
+    }
+  }
+
+  _buildSingleSubtitle(Subtitle subtitle) {
+    double width = computeWidth(subtitle);
+    double startX = computeStartX(subtitle);
+
+    return Positioned(
+        left: startX,
+        top: 10,
+        child: GestureDetector(
+          onTap: () {
+            //set highlighted subtitle
+            isHighlighted = !isHighlighted;
+            if (isHighlighted) {
+              widget.controller.highlightSubtitle = subtitle;
+            } else {
+              widget.controller.highlightSubtitle = null;
+            }
+            print(
+                "UI:highlightSubtitle: ${widget.controller.highlightSubtitle}");
+            setState(() {});
+          },
+          child:
+              //add left arrow
+              Container(
+            width: width,
+            height: widget.height,
+            decoration: BoxDecoration(
+              color: const Color(0xFF974836),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            padding: const EdgeInsets.all(5.0),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                subtitle.data,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          //add left arrow
+        ));
   }
 }

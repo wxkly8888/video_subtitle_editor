@@ -1,4 +1,9 @@
-import 'package:subtitle/subtitle.dart';
+
+import 'package:video_subtitle_editor/src/models/subtitle.dart';
+
+import 'subtitle/exceptions.dart';
+import 'subtitle/subtitle_controller.dart';
+import 'subtitle/subtitle_provider.dart';
 
 class MySubtitleController extends ISubtitleController {
   MySubtitleController({
@@ -13,7 +18,7 @@ class MySubtitleController extends ISubtitleController {
   Subtitle? durationSearch(Duration duration) {
     if (!initialized) throw NotInitializedException();
 
-    final l = 0;
+    const l = 0;
     final r = subtitles.length - 1;
 
     var index = _binarySearch(l, r, duration);
@@ -33,7 +38,7 @@ class MySubtitleController extends ISubtitleController {
 
       // If element is smaller than mid, then
       // it can only be present in left subarray
-      if (subtitles[mid].isLarg(duration)) {
+      if (subtitles[mid].isLarge(duration)) {
         return _binarySearch(mid + 1, r, duration);
       }
 

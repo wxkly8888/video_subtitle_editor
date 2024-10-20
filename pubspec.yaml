@@ -13,7 +13,6 @@ dependencies:
   video_player: ^2.6.1
   path: ^1.8.0 # update to `1.8.1` causes #79
   path_provider: ^2.0.12
-  subtitle:
 
 dev_dependencies:
   flutter_test:
