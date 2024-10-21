@@ -9,11 +9,9 @@ class SubtitleSlider extends StatefulWidget {
     super.key,
     required this.controller,
     this.height = 100,
-    this.horizontalMargin = 20,
   });
 
   final VideoSubtitleController controller;
-  final double horizontalMargin;
 
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
@@ -27,21 +25,30 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
 
   /// The max width of [SubtitleSlider]
   double _sliderWidth = 1.0;
+
+  /// how many pixels per second
   static const double perPixelInSec = 100.0;
+
+  /// the width of the left and right touch areas
   static const double touchWidth = 30.0;
+
+  /// the height of the left and right touch areas
   static const double touchHeight = 60.0;
 
   late final ScrollController _scrollController;
+
+  /// the horizontal margin of the slider
   late double _horizontalMargin;
+  /// the stream of subtitles
   late final Stream<List<Subtitle>> _stream = (() => getSubtitles())();
-
+  ///is the subtitle highlighted in edit mode
   bool isHighlighted = false;
+  ///how many pixels per second should be scrolled as video is playing
   double speed = 1;
-
   @override
   void initState() {
     super.initState();
-    _horizontalMargin = widget.horizontalMargin;
+    //half of screen width
     calculateSliderWidth(widget.controller);
     _scrollController = ScrollController();
     _scrollController.addListener(attachScroll);
@@ -52,7 +59,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   calculateSliderWidth(VideoSubtitleController controller) {
     final duration = controller.videoDuration.inSeconds;
     _sliderWidth = duration.toDouble() * perPixelInSec;
-    print("UI:_sliderWidth: $_sliderWidth");
   }
 
   int lastTimeStamp = 0;
@@ -66,8 +72,8 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
           widget.controller.videoPosition.inMilliseconds - lastTimeStamp;
       lastTimeStamp = widget.controller.videoPosition.inMilliseconds;
       if (interval > 0) {
-        _scrollController.animateTo(speed * lastTimeStamp,
-            duration: Duration(milliseconds: interval), curve: Curves.linear);
+        _scrollController.animateTo(speed * (lastTimeStamp + 500),
+            duration: const Duration(milliseconds: 500), curve: Curves.linear);
       }
     }
   }
@@ -86,8 +92,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
         if (widget.controller.isPlaying) {
           widget.controller.video.pause();
         }
-        print("User is scrolling");
-        print("UI:_scrollController.offset: ${_scrollController.offset}");
         isHighlighted = false;
         _controllerSeekTo(_scrollController.offset);
       } else {}
@@ -127,6 +131,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
 
   @override
   Widget build(BuildContext context) {
+    _horizontalMargin = MediaQuery.of(context).size.width / 2;
     return Stack(children: [
       SingleChildScrollView(
           controller: _scrollController,
@@ -158,7 +163,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                         ),
                         child: Container(
                             height: widget.height + 20,
-                            width: _sliderWidth + 20,
+                            width: _sliderWidth,
                             color: Colors.grey.withOpacity(0.2),
                             child: Stack(children: [
                               ...data.map((subtitle) {
