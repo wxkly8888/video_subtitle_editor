@@ -127,18 +127,19 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
-        scrollDirection: Axis.horizontal,
-        child: LayoutBuilder(builder: (_, box) {
-          return StreamBuilder<List<Subtitle>>(
-            stream: _stream,
-            builder: (_, snapshot) {
-              final data = snapshot.data;
-              if (data == null) return const SizedBox();
+    return Stack(children: [
+      SingleChildScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          scrollDirection: Axis.horizontal,
+          child: LayoutBuilder(builder: (_, box) {
+            return StreamBuilder<List<Subtitle>>(
+              stream: _stream,
+              builder: (_, snapshot) {
+                final data = snapshot.data;
+                if (data == null) return const SizedBox();
 
-              return Padding(
+                return Padding(
                   padding: EdgeInsets.symmetric(horizontal: _horizontalMargin),
                   child: Column(children: [
                     CustomPaint(
@@ -226,10 +227,35 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                             ),
                                           )))),
                             ])))
-                  ]));
-            },
-          );
-        }));
+                  ]),
+                );
+              },
+            );
+          })),
+      Center(
+        child: Padding(
+            padding: EdgeInsets.only(top: 15),
+            child: Column(
+              children: [
+                Image.asset(
+                  'images/inverted_triangle.png',
+                  package: "video_subtitle_editor",
+                  width: 20,
+                  color: Colors.red,
+                ),
+                Container(
+                  height: widget.height + 30,
+                  width: 2,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                    color: Colors.red,
+                    width: 2,
+                  )),
+                )
+              ],
+            )),
+      )
+    ]);
   }
 
   double _calculateLeftTouch() {
