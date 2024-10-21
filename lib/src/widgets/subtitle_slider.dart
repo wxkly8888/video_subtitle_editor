@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:video_subtitle_editor/src/models/subtitle.dart';
 import 'package:video_subtitle_editor/src/widgets/scale_line.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
@@ -35,7 +36,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   late final Stream<List<Subtitle>> _stream = (() => getSubtitles())();
 
   bool isHighlighted = false;
-
+  double speed =1;
   @override
   void initState() {
     super.initState();
@@ -43,12 +44,28 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     calculateSliderWidth(widget.controller);
     _scrollController = ScrollController();
     _scrollController.addListener(attachScroll);
+     widget.controller.video.addListener(videoUpdate);
+     speed= _sliderWidth/widget.controller.videoDuration.inMilliseconds;
   }
 
   calculateSliderWidth(VideoSubtitleController controller) {
     final duration = controller.videoDuration.inSeconds;
     _sliderWidth = duration.toDouble() * perPixelInSec;
     print("UI:_sliderWidth: $_sliderWidth");
+  }
+  int lastTimeStamp= 0;
+  bool isAutoScrolling = false;
+  videoUpdate() {
+    //how to update SingleChildScrollView scroll position when video is playing
+    if (widget.controller.video.value.isPlaying) {
+      isAutoScrolling = true;
+      int interval = widget.controller.videoPosition.inMilliseconds-lastTimeStamp;
+      lastTimeStamp = widget.controller.videoPosition.inMilliseconds;
+      if(interval>0){
+        _scrollController.animateTo(speed*lastTimeStamp, duration: Duration(milliseconds: interval), curve: Curves.linear);
+      }
+      // _scrollController.position.correctBy();
+    }
   }
 
   @override
@@ -61,9 +78,15 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     if (_scrollController.position.isScrollingNotifier.value) {
       // print("attachTrimToScroll called offset: ${_scrollController.offset}");
       // update trim and video position
-      print("UI:_scrollController.offset: ${_scrollController.offset}");
-      isHighlighted = false;
-      _controllerSeekTo(_scrollController.offset);
+      if (_scrollController.position.userScrollDirection != ScrollDirection.idle) {
+        print("User is scrolling");
+        print("UI:_scrollController.offset: ${_scrollController.offset}");
+        isHighlighted = false;
+
+        _controllerSeekTo(_scrollController.offset);
+      } else {
+      }
+
     }
   }
 
@@ -206,7 +229,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   }
 
   double _calculateLeftTouch() {
-    print("_calculateLeftTouch called");
+    // print("_calculateLeftTouch called");
     return widget.controller.highlightSubtitle != null
         ? computeStartX(widget.controller.highlightSubtitle!) - touchWidth
         : 0.0;
