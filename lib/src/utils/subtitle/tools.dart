@@ -5,5 +5,5 @@ String fileName(String str) {
 
 String fileExtension(String str) {
   if (str.endsWith('/')) str = str.substring(0, str.length - 1);
-  return '.' + fileName(str).split('.').last;
+  return '.${fileName(str).split('.').last}';
 }

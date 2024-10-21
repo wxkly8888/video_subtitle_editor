@@ -9,6 +9,7 @@ class SubtitleSlider extends StatefulWidget {
     super.key,
     required this.controller,
     this.height = 100,
+
   });
 
   final VideoSubtitleController controller;

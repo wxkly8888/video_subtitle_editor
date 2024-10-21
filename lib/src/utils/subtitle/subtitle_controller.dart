@@ -66,8 +66,8 @@ abstract class ISubtitleController {
 /// [ISubtitleController] to create your custom.
 class SubtitleController extends ISubtitleController {
   SubtitleController({
-    required SubtitleProvider provider,
-  }) : super(provider: provider);
+    required super.provider,
+  });
 
   /// Fetch your current single subtitle value by providing the duration.
   @override
@@ -82,6 +82,7 @@ class SubtitleController extends ISubtitleController {
     if (index > -1) {
       return subtitles[index];
     }
+    return null;
   }
 
   /// Perform binary search when search about subtitle by duration.
@@ -110,7 +111,6 @@ class SubtitleController extends ISubtitleController {
   @override
   List<Subtitle> multiDurationSearch(Duration duration) {
     var correctSubtitles = List<Subtitle>.empty(growable: true);
-
     subtitles.forEach((value) {
       if (value.inRange(duration)) correctSubtitles.add(value);
     });

@@ -2,9 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:video_player/video_player.dart';
-import 'package:video_subtitle_editor/src/utils/subtitle/asset_subtitle.dart';
-import 'package:video_subtitle_editor/src/utils/mysubtitle_controller.dart';
-
+import 'package:video_subtitle_editor/src/utils/subtitle/subtitle_controller.dart';
 import 'models/subtitle.dart';
 
 class VideoSubtitleController extends ChangeNotifier {
@@ -88,17 +86,13 @@ class VideoSubtitleController extends ChangeNotifier {
     }
     return null;
   }
-  Future<void> initialize() async {
+  Future<void> initialize(SubtitleController controller) async {
     await _video.initialize();
 
     _video.addListener(_videoListener);
     _video.setLooping(true);
-    var subtitlePath = "assets/test.srt";
-    var controller = MySubtitleController(
-      provider: AssetSubtitle(subtitlePath),
-    );
     await controller.initial();
-    _subtitles = controller.getAllTitles();
+    _subtitles = controller.subtitles;
     notifyListeners();
   }
 

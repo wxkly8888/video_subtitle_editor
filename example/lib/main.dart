@@ -91,8 +91,12 @@ class _VideoEditorState extends State<VideoEditor> {
   @override
   void initState() {
     super.initState();
+    var subtitlePath = "assets/test.srt";
+    var controller = SubtitleController(
+      provider: AssetSubtitle(subtitlePath),
+    );
     _controller
-        .initialize()
+        .initialize(controller)
         .then((_) =>
         setState(() {}))
         .catchError((error) {});
