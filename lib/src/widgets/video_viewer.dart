@@ -10,8 +10,10 @@ class VideoViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("video viewer called controller.isPlaying:${controller.isPlaying}");
     return GestureDetector(
         onTap: () {
+          print ("ontap called :${controller.video.value.isPlaying}");
           if (controller.video.value.isPlaying) {
             controller.video.pause();
           } else {

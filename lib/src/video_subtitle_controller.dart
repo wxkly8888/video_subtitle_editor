@@ -90,6 +90,7 @@ class VideoSubtitleController extends ChangeNotifier {
   }
   Future<void> initialize() async {
     await _video.initialize();
+
     _video.addListener(_videoListener);
     _video.setLooping(true);
     var subtitlePath = "assets/test.srt";
