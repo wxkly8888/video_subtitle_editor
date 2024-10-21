@@ -9,13 +9,25 @@ class SubtitleSlider extends StatefulWidget {
     super.key,
     required this.controller,
     this.height = 100,
-
+    this.subtitleBackgroundColor = const Color(0xFF974836),
+    this.touchAreaColor =  Colors.grey,
+    this.subtitleTextStyle = const TextStyle(
+      color: Colors.white,
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+    ),
   });
 
   final VideoSubtitleController controller;
 
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
+
+  ///the background color of the subtitle
+  final Color subtitleBackgroundColor;
+  ///the color of the touch area
+  final Color touchAreaColor;
+  final TextStyle subtitleTextStyle;
 
   @override
   State<SubtitleSlider> createState() => _SubtitleSliderState();
@@ -31,26 +43,32 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   static const double perPixelInSec = 100.0;
 
   /// the width of the left and right touch areas
-  static const double touchWidth = 30.0;
+  double touchWidth = 30.0;
 
   /// the height of the left and right touch areas
-  static const double touchHeight = 60.0;
+  double touchHeight = 60.0;
 
   late final ScrollController _scrollController;
 
   /// the horizontal margin of the slider
   late double _horizontalMargin;
+
   /// the stream of subtitles
   late final Stream<List<Subtitle>> _stream = (() => getSubtitles())();
+
   ///is the subtitle highlighted in edit mode
   bool isHighlighted = false;
+
   ///how many pixels per second should be scrolled as video is playing
   double speed = 1;
+
   @override
   void initState() {
     super.initState();
     //half of screen width
     calculateSliderWidth(widget.controller);
+    touchHeight = widget.height/2;
+    touchWidth = widget.height/4;
     _scrollController = ScrollController();
     _scrollController.addListener(attachScroll);
     widget.controller.video.addListener(videoUpdate);
@@ -185,19 +203,19 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                           child: Container(
                                             width: touchWidth,
                                             height: touchHeight,
-                                            decoration: const BoxDecoration(
-                                                color: Colors.green,
-                                                borderRadius: BorderRadius.only(
+                                            decoration: BoxDecoration(
+                                                color: widget.touchAreaColor,
+                                                borderRadius: const BorderRadius.only(
                                                     topLeft:
                                                         Radius.circular(10),
                                                     bottomLeft:
                                                         Radius.circular(10))),
                                             padding: const EdgeInsets.all(5.0),
-                                            child: const Align(
+                                            child:  Align(
                                               alignment: Alignment.center,
                                               child: Icon(
                                                 Icons.arrow_back_ios_rounded,
-                                                color: Colors.white,
+                                                size: touchWidth-10,
                                               ),
                                             ),
                                           )))),
@@ -216,19 +234,20 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                           child: Container(
                                             width: touchWidth,
                                             height: touchHeight,
-                                            decoration: const BoxDecoration(
-                                                color: Colors.green,
-                                                borderRadius: BorderRadius.only(
+                                            decoration: BoxDecoration(
+                                                color: widget.touchAreaColor,
+                                                borderRadius: const BorderRadius.only(
                                                     topRight:
                                                         Radius.circular(10),
                                                     bottomRight:
                                                         Radius.circular(10))),
                                             padding: const EdgeInsets.all(5.0),
-                                            child: const Align(
+                                            child: Align(
                                               alignment: Alignment.center,
                                               child: Icon(
                                                 Icons.arrow_forward_ios_rounded,
                                                 color: Colors.white,
+                                                size: touchWidth-10,
                                               ),
                                             ),
                                           )))),
@@ -334,8 +353,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             } else {
               widget.controller.highlightSubtitle = null;
             }
-            print(
-                "UI:highlightSubtitle: ${widget.controller.highlightSubtitle}");
             setState(() {});
           },
           child:
@@ -344,7 +361,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             width: width,
             height: widget.height,
             decoration: BoxDecoration(
-              color: const Color(0xFF974836),
+              color: widget.subtitleBackgroundColor,
               borderRadius: BorderRadius.circular(15),
             ),
             padding: const EdgeInsets.all(5.0),
@@ -352,11 +369,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
               alignment: Alignment.center,
               child: Text(
                 subtitle.data,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: widget.subtitleTextStyle,
               ),
             ),
           ),

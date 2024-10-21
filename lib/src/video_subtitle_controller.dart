@@ -88,7 +88,6 @@ class VideoSubtitleController extends ChangeNotifier {
   }
   Future<void> initialize(SubtitleController controller) async {
     await _video.initialize();
-
     _video.addListener(_videoListener);
     _video.setLooping(true);
     await controller.initial();
