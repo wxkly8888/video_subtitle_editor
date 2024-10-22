@@ -10,7 +10,7 @@ class SubtitleSlider extends StatefulWidget {
     required this.controller,
     this.height = 100,
     this.subtitleBackgroundColor = const Color(0xFF974836),
-    this.touchAreaColor =  Colors.grey,
+    this.touchAreaColor = Colors.grey,
     this.subtitleTextStyle = const TextStyle(
       color: Colors.white,
       fontSize: 14,
@@ -25,6 +25,7 @@ class SubtitleSlider extends StatefulWidget {
 
   ///the background color of the subtitle
   final Color subtitleBackgroundColor;
+
   ///the color of the touch area
   final Color touchAreaColor;
   final TextStyle subtitleTextStyle;
@@ -34,8 +35,6 @@ class SubtitleSlider extends StatefulWidget {
 }
 
 class _SubtitleSliderState extends State<SubtitleSlider> {
-
-
   /// The max width of [SubtitleSlider]
   double _sliderWidth = 1.0;
 
@@ -67,8 +66,8 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     super.initState();
     //half of screen width
     calculateSliderWidth(widget.controller);
-    touchHeight = widget.height/2;
-    touchWidth = widget.height/4;
+    touchHeight = widget.height / 2;
+    touchWidth = widget.height / 4;
     _scrollController = ScrollController();
     _scrollController.addListener(attachScroll);
     widget.controller.video.addListener(videoUpdate);
@@ -202,17 +201,19 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                             height: widget.height,
                                             decoration: BoxDecoration(
                                                 color: widget.touchAreaColor,
-                                                borderRadius: const BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(10),
-                                                    bottomLeft:
-                                                        Radius.circular(10))),
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(10),
+                                                        bottomLeft:
+                                                            Radius.circular(
+                                                                10))),
                                             padding: const EdgeInsets.all(5.0),
-                                            child:  Align(
+                                            child: Align(
                                               alignment: Alignment.center,
                                               child: Icon(
                                                 Icons.arrow_back_ios_rounded,
-                                                size: touchWidth-10,
+                                                size: touchWidth - 10,
                                               ),
                                             ),
                                           )))),
@@ -231,18 +232,20 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                             height: widget.height,
                                             decoration: BoxDecoration(
                                                 color: widget.touchAreaColor,
-                                                borderRadius: const BorderRadius.only(
-                                                    topRight:
-                                                        Radius.circular(10),
-                                                    bottomRight:
-                                                        Radius.circular(10))),
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                        topRight:
+                                                            Radius.circular(10),
+                                                        bottomRight:
+                                                            Radius.circular(
+                                                                10))),
                                             padding: const EdgeInsets.all(5.0),
                                             child: Align(
                                               alignment: Alignment.center,
                                               child: Icon(
                                                 Icons.arrow_forward_ios_rounded,
                                                 color: Colors.white,
-                                                size: touchWidth-10,
+                                                size: touchWidth - 10,
                                               ),
                                             ),
                                           )))),
@@ -360,11 +363,15 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             height: widget.height,
             decoration: BoxDecoration(
               color: widget.subtitleBackgroundColor,
-              border: isHighlighted&&subtitle==widget.controller.highlightSubtitle? Border.all(
-                color: widget.touchAreaColor,
-                width: 2,
-              ):null,
-              borderRadius: isHighlighted ? BorderRadius.zero:BorderRadius.circular(10),
+              border: isHighlighted &&
+                      subtitle == widget.controller.highlightSubtitle
+                  ? Border.all(
+                      color: widget.touchAreaColor,
+                      width: 2,
+                    )
+                  : null,
+              borderRadius:
+                  isHighlighted ? BorderRadius.zero : BorderRadius.circular(10),
             ),
             padding: const EdgeInsets.all(5.0),
             child: Align(
