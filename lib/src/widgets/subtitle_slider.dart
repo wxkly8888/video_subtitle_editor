@@ -1,16 +1,19 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:video_subtitle_editor/src/models/subtitle.dart';
 import 'package:video_subtitle_editor/src/widgets/scale_line.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
-class SubtitleSlider extends StatefulWidget {
+class SubtitleSlider extends StatefulWidget  {
   const SubtitleSlider({
     super.key,
     required this.controller,
     this.height = 100,
     this.subtitleBackgroundColor = const Color(0xFF974836),
     this.touchAreaColor = Colors.grey,
+    this.baselineColor = Colors.redAccent,
     this.subtitleTextStyle = const TextStyle(
       color: Colors.white,
       fontSize: 14,
@@ -20,8 +23,10 @@ class SubtitleSlider extends StatefulWidget {
 
   final VideoSubtitleController controller;
 
+
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
+  final Color baselineColor;
 
   ///the background color of the subtitle
   final Color subtitleBackgroundColor;
@@ -34,7 +39,7 @@ class SubtitleSlider extends StatefulWidget {
   State<SubtitleSlider> createState() => _SubtitleSliderState();
 }
 
-class _SubtitleSliderState extends State<SubtitleSlider> {
+class _SubtitleSliderState extends State<SubtitleSlider>   with SingleTickerProviderStateMixin {
   /// The max width of [SubtitleSlider]
   double _sliderWidth = 1.0;
 
@@ -163,7 +168,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
 
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: _horizontalMargin),
-                  child: Column(children: [
+                  child: Stack(children: [
                     CustomPaint(
                       size: Size(_sliderWidth, 30),
                       // Specify the size of the canvas
@@ -171,9 +176,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                         tickCount: widget.controller.videoDuration.inSeconds,
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                   Padding(padding: const EdgeInsets.only(top: 35), child:
                     ClipRRect(
                         borderRadius: BorderRadius.circular(
                           20,
@@ -249,7 +252,36 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                               ),
                                             ),
                                           )))),
-                            ])))
+
+                            ])))),
+                    //add a icon button at the center of highlighted subtitle
+                    Visibility(
+                        visible: isHighlighted,
+                        child: Positioned(
+                            left: _calculateLeftTouch()+_calculateSubtitleWidth()/2,
+                            child: GestureDetector(
+                                onTap: () {
+                                  //delete the highlighted subtitle
+                                  // widget.controller.deleteSubtitle(
+                                  //     widget.controller.highlightSubtitle!);
+                                  widget.controller.highlightSubtitle = null;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                      const BorderRadius.all(
+                                          Radius.circular(10))),
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                      size: 25,
+                                    ),
+                                  ),
+                                )))),
                   ]),
                 );
               },
@@ -264,23 +296,30 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                   'images/inverted_triangle.png',
                   package: "video_subtitle_editor",
                   width: 20,
-                  color: Colors.red,
+                  color: widget.baselineColor
                 ),
                 Container(
                   height: widget.height + 30,
                   width: 2,
                   decoration: BoxDecoration(
                       border: Border.all(
-                    color: Colors.red,
+                   color: widget.baselineColor,
                     width: 2,
                   )),
                 )
               ],
             )),
-      )
+      ),
+
     ]);
   }
 
+  double _calculateDeleteBtnStartX() {
+    if(widget.controller.highlightSubtitle == null) return 0.0;
+    return computeStartX(widget.controller.highlightSubtitle!) +_horizontalMargin+
+        computeWidth(widget.controller.highlightSubtitle!) / 2 -
+        10;
+  }
   double _calculateLeftTouch() {
     return widget.controller.highlightSubtitle != null
         ? computeStartX(widget.controller.highlightSubtitle!) - touchWidth
@@ -293,7 +332,11 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             computeWidth(widget.controller.highlightSubtitle!)
         : 0.0;
   }
-
+  double _calculateSubtitleWidth() {
+    return widget.controller.highlightSubtitle != null
+        ? computeWidth(widget.controller.highlightSubtitle!)
+        : 0.0;
+  }
   /// Adjust the subtitle start time based on the drag details
   /// @param details: the drag details
   adjustSubtitleStartTime(DragUpdateDetails details) {
