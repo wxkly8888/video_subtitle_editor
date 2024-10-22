@@ -54,10 +54,10 @@ class VideoSubtitleController extends ChangeNotifier {
  ///get a pre subtitle of current subtitle
   ///if current subtitle is null, return null
   Subtitle? getPreSubtitle() {
-    if(_subtitle == null) {
+    if(highlightSubtitle == null) {
       return null;
     }
-    int index = _subtitles.indexOf(_subtitle!);
+    int index = _subtitles.indexOf(highlightSubtitle!);
     if(index == 0) {
       return null;
     }
@@ -67,10 +67,10 @@ class VideoSubtitleController extends ChangeNotifier {
   ///if current subtitle is null, return null
   ///if current subtitle is the last subtitle, return null
   Subtitle? getNextSubtitle() {
-    if(_subtitle == null) {
+    if(highlightSubtitle == null) {
       return null;
     }
-    int index = _subtitles.indexOf(_subtitle!);
+    int index = _subtitles.indexOf(highlightSubtitle!);
     if(index == _subtitles.length - 1) {
       return null;
     }

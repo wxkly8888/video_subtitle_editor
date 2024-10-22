@@ -34,7 +34,7 @@ class SubtitleSlider extends StatefulWidget {
 }
 
 class _SubtitleSliderState extends State<SubtitleSlider> {
-  final ValueNotifier<Rect> _rect = ValueNotifier<Rect>(Rect.zero);
+
 
   /// The max width of [SubtitleSlider]
   double _sliderWidth = 1.0;
@@ -99,7 +99,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
 
   @override
   void dispose() {
-    _rect.dispose();
     super.dispose();
   }
 
@@ -192,9 +191,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                   visible: isHighlighted,
                                   child: Positioned(
                                       left: _calculateLeftTouch(),
-                                      top: 10 +
-                                          widget.height / 2 -
-                                          touchHeight / 2,
+                                      top: 10,
                                       child: GestureDetector(
                                           onHorizontalDragUpdate: (details) {
                                             adjustSubtitleStartTime(details);
@@ -202,7 +199,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                           },
                                           child: Container(
                                             width: touchWidth,
-                                            height: touchHeight,
+                                            height: widget.height,
                                             decoration: BoxDecoration(
                                                 color: widget.touchAreaColor,
                                                 borderRadius: const BorderRadius.only(
@@ -223,9 +220,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                   visible: isHighlighted,
                                   child: Positioned(
                                       left: _calculateRightTouch(),
-                                      top: 10 +
-                                          widget.height / 2 -
-                                          touchHeight / 2,
+                                      top: 10,
                                       child: GestureDetector(
                                           onHorizontalDragUpdate: (details) {
                                             adjustSubtitleEndTime(details);
@@ -233,7 +228,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
                                           },
                                           child: Container(
                                             width: touchWidth,
-                                            height: touchHeight,
+                                            height: widget.height,
                                             decoration: BoxDecoration(
                                                 color: widget.touchAreaColor,
                                                 borderRadius: const BorderRadius.only(
@@ -284,7 +279,6 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
   }
 
   double _calculateLeftTouch() {
-    // print("_calculateLeftTouch called");
     return widget.controller.highlightSubtitle != null
         ? computeStartX(widget.controller.highlightSubtitle!) - touchWidth
         : 0.0;
@@ -303,10 +297,13 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     if (widget.controller.highlightSubtitle == null) return;
     double offsetX =
         (details.primaryDelta ?? 0) / (_sliderWidth + _horizontalMargin * 2);
+    print("UI: slider primaryDelta=${details.primaryDelta} offsetX: $offsetX");
+
     final to = widget.controller.videoDuration * offsetX;
     if (widget.controller.highlightSubtitle != null) {
-      var adjustStartX = widget.controller.highlightSubtitle!.start - to;
+      var adjustStartX = widget.controller.highlightSubtitle!.start + to;
       //check if start time is less than pre subtitle end time
+      print("pre subtitle end: ${widget.controller.getPreSubtitle()?.end}");
       if (adjustStartX <=
           (widget.controller.getPreSubtitle()?.end ??
               const Duration(seconds: 0))) {
@@ -323,6 +320,7 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
     if (widget.controller.highlightSubtitle == null) return;
     double offsetX =
         (details.primaryDelta ?? 0) / (_sliderWidth + _horizontalMargin * 2);
+    print("UI: slider primaryDelta=${details.primaryDelta} offsetX: $offsetX");
     final to = widget.controller.videoDuration * offsetX;
     if (widget.controller.highlightSubtitle != null) {
       var adjustEndX = widget.controller.highlightSubtitle!.end + to;
@@ -362,7 +360,11 @@ class _SubtitleSliderState extends State<SubtitleSlider> {
             height: widget.height,
             decoration: BoxDecoration(
               color: widget.subtitleBackgroundColor,
-              borderRadius: BorderRadius.circular(15),
+              border: isHighlighted&&subtitle==widget.controller.highlightSubtitle? Border.all(
+                color: widget.touchAreaColor,
+                width: 2,
+              ):null,
+              borderRadius: isHighlighted ? BorderRadius.zero:BorderRadius.circular(10),
             ),
             padding: const EdgeInsets.all(5.0),
             child: Align(
