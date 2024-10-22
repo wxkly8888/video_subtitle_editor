@@ -76,7 +76,11 @@ class VideoSubtitleController extends ChangeNotifier {
     }
     return _subtitles[index + 1];
   }
-
+  deleteHighlightedSubtitle() {
+    _subtitles.remove(highlightSubtitle);
+    highlightSubtitle = null;
+    notifyListeners();
+  }
   ///get a subtitle from a timestamp
   getSubtitleFromTimeStamp(Duration timestamp) {
     for(int i = 0; i < _subtitles.length; i++) {
