@@ -8,6 +8,7 @@
 // import 'package:video_subtitle_editor/src/subtitle_controller.dart';
 // import 'package:video_subtitle_editor/src/video_controller.dart';
 // import 'package:video_subtitle_editor/src/models/file_format.dart';
+// import 'package:video_subtitle_editor/src/video_subtitle_controller.dart';
 //
 // class FFmpegVideoEditorExecute {
 //   const FFmpegVideoEditorExecute({
@@ -82,11 +83,7 @@
 //   // /// });
 //   // /// ```
 //   // /// Returns the [double] progress value between 0.0 and 1.0.
-//   // double getFFmpegProgress(int time) {
-//   //   final double progressValue =
-//   //       time / controller.trimmedDuration.inMilliseconds;
-//   //   return progressValue.clamp(0.0, 1.0);
-//   // }
+//
 //
 //   /// Returns the [FFmpegVideoEditorExecute] that contains the param to provide to FFmpeg.
 //   Future<FFmpegVideoEditorExecute?> getExecuteConfig();

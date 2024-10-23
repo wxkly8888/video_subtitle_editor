@@ -120,8 +120,6 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     }
   }
 
-  /// Scroll to update [_rect] and trim values on scroll
-  /// Will fix [_rect] to the scroll view when it is bouncing
   /// Sets the video's current timestamp to be at the [position] on the slider
   /// If the expected position is bigger than [subtitleController.endTrim], set it to [subtitleController.endTrim]
   void _controllerSeekTo(double position) async {
@@ -299,7 +297,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
           })),
       Center(
         child: Padding(
-            padding: EdgeInsets.only(top: 15),
+            padding: const EdgeInsets.only(top: 15),
             child: Column(
               children: [
                 Image.asset('images/inverted_triangle.png',
@@ -377,7 +375,6 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     if (widget.controller.highlightSubtitle == null) return;
     double offsetX =
         (details.primaryDelta ?? 0) / (_sliderWidth + _horizontalMargin * 2);
-    print("UI: slider primaryDelta=${details.primaryDelta} offsetX: $offsetX");
     final to = widget.controller.videoDuration * offsetX;
     if (widget.controller.highlightSubtitle != null) {
       var adjustEndX = widget.controller.highlightSubtitle!.end + to;

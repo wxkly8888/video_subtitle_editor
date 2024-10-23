@@ -99,7 +99,22 @@ class VideoSubtitleController extends ChangeNotifier {
     notifyListeners();
   }
 
-
+  String generateSubtitleContent() {
+    StringBuffer buffer = StringBuffer();
+    for (int i = 0; i < _subtitles.length; i++) {
+      final subtitle = _subtitles[i];
+      buffer.writeln('${i + 1}');
+      buffer.writeln('${_formatDuration(subtitle.start)} --> ${_formatDuration(subtitle.end)}');
+      buffer.writeln(subtitle.data);
+      buffer.writeln();
+    }
+    return buffer.toString();
+  }
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String threeDigits(int n) => n.toString().padLeft(3, '0');
+    return '${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))},${threeDigits(duration.inMilliseconds.remainder(1000))}';
+  }
   void _videoListener() {
     seekSubtitleTo(videoPosition);
   }

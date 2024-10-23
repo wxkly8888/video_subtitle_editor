@@ -36,10 +36,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   fraction: ^4.1.4
-  image_picker: ^0.8.9
+  image_picker: ^1.1.2
   path: ^1.8.2
+  path_provider: ^2.1.4
   video_player: ^2.6.1
-  ffmpeg_kit_flutter_min: ^5.1.0
+
+  ffmpeg_kit_flutter_video: ^6.0.3
   video_subtitle_editor:
     path: ../
 dev_dependencies:

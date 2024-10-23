@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:example/widgets/export_result.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
+
 import 'export_service.dart';
+import 'widgets/export_result.dart';
 
 void main() => runApp(
       MaterialApp(
@@ -120,41 +120,50 @@ class _VideoEditorState extends State<VideoEditor> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          duration: const Duration(seconds: 1),
+          duration: const Duration(seconds: 10),
         ),
       );
+  double getFFmpegProgress(double time) {
+    final double progressValue =
+        time / _controller.videoPosition.inMilliseconds;
+    return progressValue.clamp(0.0, 1.0);
+  }
 
   void _exportVideo() async {
     _exportingProgress.value = 0;
     _isExporting.value = true;
-
-    // final config = VideoFFmpegVideoEditorConfig(
-    //   _controller,
-    //   // format: VideoExportFormat.gif,
-    //   // commandBuilder: (config, videoPath, outputPath) {
-    //   //   final List<String> filters = config.getExportFilters();
-    //   //   filters.add('hflip'); // add horizontal flip
-    //
-    //   //   return '-i $videoPath ${config.filtersCmd(filters)} -preset ultrafast $outputPath';
-    //   // },
-    // );
-
-    // await ExportService.runFFmpegCommand(
-    //   await config.getExecuteConfig(),
-    //   onProgress: (stats) {
-    //     _exportingProgress.value = config.getFFmpegProgress(stats.getTime());
-    //   },
-    //   onError: (e, s) => _showErrorSnackBar("Error on export video :("),
-    //   onCompleted: (file) {
-    //     _isExporting.value = false;
-    //     if (!mounted) return;
-    //
-    //     showDialog(
-    //       context: context,
-    //       builder: (_) => VideoResultPopup(video: file),
-    //     );
-    //   },
-    // );
+    //how to generate a subtitle file base on _controller.subtitles
+    // final subtitlePath = await _controller.exportSubtitles();
+    String content = _controller.generateSubtitleContent();
+    // print("subtitle Content: $content");
+    var subtitlePath = await ExportService.createTempSubtitleFile(content);
+    print("subtitle path: $subtitlePath");
+    var videoOutputPath = await ExportService.generateOutputPath();
+    print("subtitle video output path: $videoOutputPath");
+    await ExportService.exportVideoWithSubtitles(
+      videoPath: widget.videoFile.path,
+      subtitlePath: subtitlePath,
+      outputPath:videoOutputPath,
+      onProgress: (stats) {
+        print("export onprogress: ${stats.getTime()}");
+        _exportingProgress.value = getFFmpegProgress(stats.getTime());
+      },
+      onError: (e, s) {
+        _isExporting.value = false;
+        if (!mounted) return;
+        print("export Error on export video :( $s");
+        _showErrorSnackBar("Error on export video :( $e");
+      },
+      onCompleted: (file) {
+        print("export completed");
+        _isExporting.value = false;
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (_) => VideoResultPopup(video: file),
+        );
+      },
+    );
   }
 
   @override
