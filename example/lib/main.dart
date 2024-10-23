@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
-
-import 'export_service.dart';
 import 'widgets/export_result.dart';
 
 void main() => runApp(

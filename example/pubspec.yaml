@@ -41,7 +41,7 @@ dependencies:
   path_provider: ^2.1.4
   video_player: ^2.6.1
 
-  ffmpeg_kit_flutter_video: ^6.0.3
+
   video_subtitle_editor:
     path: ../
 dev_dependencies:

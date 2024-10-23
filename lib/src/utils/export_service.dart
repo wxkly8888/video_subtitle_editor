@@ -7,7 +7,6 @@ import 'package:ffmpeg_kit_flutter_video/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter_video/return_code.dart';
 import 'package:ffmpeg_kit_flutter_video/statistics.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
 class ExportService {
 
@@ -18,7 +17,7 @@ class ExportService {
 
  static Future<String> createTempSubtitleFile(String subtitleContent) async {
     final directory = await getApplicationCacheDirectory();
-    final file = File('${directory?.path}/temp_subtitles.srt');
+    final file = File('${directory.path}/temp_subtitles.srt');
     await file.writeAsString(subtitleContent);
     return file.path;
   }
