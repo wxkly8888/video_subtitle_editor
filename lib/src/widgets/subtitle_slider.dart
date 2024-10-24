@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:video_subtitle_editor/src/models/subtitle.dart';
 import 'package:video_subtitle_editor/src/widgets/scale_line.dart';
+import 'package:video_subtitle_editor/src/widgets/subtitle_text_editor.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
 class SubtitleSlider extends StatefulWidget {
@@ -399,11 +400,29 @@ class _SubtitleSliderState extends State<SubtitleSlider>
         child: GestureDetector(
           onTap: () {
             //set highlighted subtitle
-            isHighlighted = !isHighlighted;
-            if (isHighlighted) {
+            if(!isHighlighted){
+              isHighlighted=true;
               widget.controller.highlightSubtitle = subtitle;
-            } else {
-              widget.controller.highlightSubtitle = null;
+            }else {
+              //show a fullscreen widget to edit subtitle
+              showGeneralDialog(
+                context: context,
+                barrierColor: Colors.black12.withOpacity(0.6), // Background color
+                barrierDismissible: false,
+                barrierLabel: 'Dialog',
+                transitionDuration: Duration(milliseconds: 400),
+                pageBuilder: (context, __, ___) {
+                  return Center(
+                      child: SubtitleEditor(
+                      subtitle: subtitle,
+                      onSaved: () {
+                        setState(() {
+                        });
+                      },
+                  ),
+                  );
+                },
+              );
             }
             setState(() {});
           },

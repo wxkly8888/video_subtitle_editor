@@ -94,10 +94,11 @@ class _VideoEditorState extends State<VideoEditor> {
       provider: AssetSubtitle(subtitlePath),
     );
     _controller
-        .initialize(controller)
+        .initializeVideo()
         .then((_) =>
         setState(() {}))
         .catchError((error) {});
+    _controller.initialSubtitles(controller);
     _controller.addListener(
       () {
         setState(() {});
