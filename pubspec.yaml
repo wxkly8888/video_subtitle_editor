@@ -1,7 +1,8 @@
 name: video_subtitle_editor
 description: "A new Flutter project."
 version: 0.0.1
-homepage:
+homepage: https://github.com/wxkly8888/video_subtitle_editor
+
 
 environment:
   sdk: '>=3.4.3 <4.0.0'

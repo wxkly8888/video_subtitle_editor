@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter_video/ffmpeg_kit.dart';
@@ -32,30 +31,16 @@ class ExportService {
   static Future<FFmpegSession> exportAudio({
     required String videoPath,
     required String outputPath,
-    isCutOff = false,
     required void Function(File file) onCompleted,
     void Function(Object, StackTrace)? onError,
     void Function(Statistics)? onProgress,
   }) {
-    var command;
-    if(isCutOff){
-      // Cut off the video to 1 minute
-       command = [
-        '-i', videoPath,
-        '-vn',
-        '-t', '00:01:00',
-        '-y', // Add this flag to overwrite the existing file
-        outputPath
-      ];
-    }else {
-       command = [
+    var command = [
         '-i', videoPath,
         '-vn',
         '-y', // Add this flag to overwrite the existing file
         outputPath
       ];
-    }
-
     return FFmpegKit.executeWithArgumentsAsync(
       command,
       (session) async {

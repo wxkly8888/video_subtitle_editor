@@ -18,7 +18,7 @@ class VideoViewer extends StatelessWidget {
             controller.video.play();
           }
         },
-        child: Container(
+        child: SizedBox(
           width: controller.videoWidth,
           height: controller.videoHeight,
           child: Stack(children: [

@@ -141,6 +141,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     final startX = (_sliderWidth * start) / duration;
     return startX;
   }
+
   @override
   Widget build(BuildContext context) {
     _horizontalMargin = MediaQuery.of(context).size.width / 2;
@@ -321,13 +322,10 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     if (widget.controller.highlightSubtitle == null) return;
     double offsetX =
         (details.primaryDelta ?? 0) / (_sliderWidth + _horizontalMargin * 2);
-    print("UI: slider primaryDelta=${details.primaryDelta} offsetX: $offsetX");
-
     final to = widget.controller.videoDuration * offsetX;
     if (widget.controller.highlightSubtitle != null) {
       var adjustStartX = widget.controller.highlightSubtitle!.start + to;
       //check if start time is less than pre subtitle end time
-      print("pre subtitle end: ${widget.controller.getPreSubtitle()?.end}");
       if (adjustStartX <=
           (widget.controller.getPreSubtitle()?.end ??
               const Duration(seconds: 0))) {

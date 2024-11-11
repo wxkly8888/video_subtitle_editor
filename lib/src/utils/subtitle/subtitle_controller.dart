@@ -74,7 +74,7 @@ class SubtitleController extends ISubtitleController {
   Subtitle? durationSearch(Duration duration) {
     if (!initialized) throw NotInitializedException();
 
-    final l = 0;
+    const l = 0;
     final r = subtitles.length - 1;
 
     var index = _binarySearch(l, r, duration);
