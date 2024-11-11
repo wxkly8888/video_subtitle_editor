@@ -13,7 +13,7 @@ class Subtitle {
   /// The end time of this text period.
   Duration end;
 
-   Subtitle({
+  Subtitle({
     required this.start,
     required this.end,
     required this.data,

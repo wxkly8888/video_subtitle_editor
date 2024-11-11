@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:video_subtitle_editor/src/models/subtitle.dart';
 import 'package:video_subtitle_editor/src/widgets/scale_line.dart';
-import 'package:video_subtitle_editor/src/widgets/subtitle_text_editor.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 
 class SubtitleSlider extends StatefulWidget {
@@ -57,9 +56,6 @@ class _SubtitleSliderState extends State<SubtitleSlider>
 
   /// the horizontal margin of the slider
   late double _horizontalMargin;
-
-  /// the stream of subtitles
-  late final Stream<List<Subtitle>> _stream = (() => getSubtitles())();
 
   ///is the subtitle highlighted in edit mode
   bool isHighlighted = false;
@@ -129,10 +125,6 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     await widget.controller.seekTo(to);
   }
 
-  Stream<List<Subtitle>> getSubtitles() {
-    return Stream.value(widget.controller.subtitles);
-  }
-
 // Returns the max size the layout should take with the rect value
   double computeWidth(Subtitle subtitle) {
     final start = subtitle.start.inMilliseconds;
@@ -149,7 +141,6 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     final startX = (_sliderWidth * start) / duration;
     return startX;
   }
-
   @override
   Widget build(BuildContext context) {
     _horizontalMargin = MediaQuery.of(context).size.width / 2;
@@ -158,144 +149,121 @@ class _SubtitleSliderState extends State<SubtitleSlider>
           controller: _scrollController,
           physics: const BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
-          child: LayoutBuilder(builder: (_, box) {
-            return StreamBuilder<List<Subtitle>>(
-              stream: _stream,
-              builder: (_, snapshot) {
-                final data = snapshot.data;
-                if (data == null) return const SizedBox();
-
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: _horizontalMargin),
-                  child: Stack(children: [
-                    CustomPaint(
-                      size: Size(_sliderWidth, 30),
-                      // Specify the size of the canvas
-                      painter: ScalePainter(
-                        tickCount: widget.controller.videoDuration.inSeconds,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: _horizontalMargin),
+            child: Stack(children: [
+              CustomPaint(
+                size: Size(_sliderWidth, 30),
+                // Specify the size of the canvas
+                painter: ScalePainter(
+                  tickCount: widget.controller.videoDuration.inSeconds,
+                ),
+              ),
+              Padding(
+                  padding: const EdgeInsets.only(top: 35),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        20,
                       ),
-                    ),
-                    Padding(
-                        padding: const EdgeInsets.only(top: 35),
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              20,
+                      child: Container(
+                          height: widget.height + 20,
+                          width: _sliderWidth,
+                          color: Colors.grey.withOpacity(0.2),
+                          child: Stack(children: [
+                            ...widget.controller.subtitles.map((subtitle) {
+                              return _buildSingleSubtitle(subtitle);
+                            }),
+                            Visibility(
+                                visible: isHighlighted,
+                                child: Positioned(
+                                    left: _calculateLeftTouch(),
+                                    top: 10,
+                                    child: GestureDetector(
+                                        onHorizontalDragUpdate: (details) {
+                                          adjustSubtitleStartTime(details);
+                                          setState(() {});
+                                        },
+                                        child: Container(
+                                          width: touchWidth,
+                                          height: widget.height,
+                                          decoration: BoxDecoration(
+                                              color: widget.touchAreaColor,
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(10),
+                                                      bottomLeft:
+                                                          Radius.circular(10))),
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Icon(
+                                              Icons.arrow_back_ios_rounded,
+                                              size: touchWidth - 10,
+                                            ),
+                                          ),
+                                        )))),
+                            Visibility(
+                                visible: isHighlighted,
+                                child: Positioned(
+                                    left: _calculateRightTouch(),
+                                    top: 10,
+                                    child: GestureDetector(
+                                        onHorizontalDragUpdate: (details) {
+                                          adjustSubtitleEndTime(details);
+                                          setState(() {});
+                                        },
+                                        child: Container(
+                                          width: touchWidth,
+                                          height: widget.height,
+                                          decoration: BoxDecoration(
+                                              color: widget.touchAreaColor,
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topRight:
+                                                          Radius.circular(10),
+                                                      bottomRight:
+                                                          Radius.circular(10))),
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Icon(
+                                              Icons.arrow_forward_ios_rounded,
+                                              color: Colors.white,
+                                              size: touchWidth - 10,
+                                            ),
+                                          ),
+                                        )))),
+                          ])))),
+              //add a icon button at the center of highlighted subtitle
+              Visibility(
+                  visible: isHighlighted,
+                  child: Positioned(
+                      left:
+                          _calculateLeftTouch() + _calculateSubtitleWidth() / 2,
+                      child: GestureDetector(
+                          onTap: () {
+                            //delete the highlighted subtitle
+                            widget.controller.deleteHighlightedSubtitle();
+                            widget.controller.highlightSubtitle = null;
+                            setState(() {});
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.5),
+                                shape: BoxShape.circle),
+                            padding: const EdgeInsets.all(5.0),
+                            child: const Align(
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Icons.delete_forever,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ),
-                            child: Container(
-                                height: widget.height + 20,
-                                width: _sliderWidth,
-                                color: Colors.grey.withOpacity(0.2),
-                                child: Stack(children: [
-                                  ...data.map((subtitle) {
-                                    return _buildSingleSubtitle(subtitle);
-                                  }),
-                                  Visibility(
-                                      visible: isHighlighted,
-                                      child: Positioned(
-                                          left: _calculateLeftTouch(),
-                                          top: 10,
-                                          child: GestureDetector(
-                                              onHorizontalDragUpdate:
-                                                  (details) {
-                                                adjustSubtitleStartTime(
-                                                    details);
-                                                setState(() {});
-                                              },
-                                              child: Container(
-                                                width: touchWidth,
-                                                height: widget.height,
-                                                decoration: BoxDecoration(
-                                                    color:
-                                                        widget.touchAreaColor,
-                                                    borderRadius:
-                                                        const BorderRadius.only(
-                                                            topLeft:
-                                                                Radius.circular(
-                                                                    10),
-                                                            bottomLeft:
-                                                                Radius.circular(
-                                                                    10))),
-                                                padding:
-                                                    const EdgeInsets.all(5.0),
-                                                child: Align(
-                                                  alignment: Alignment.center,
-                                                  child: Icon(
-                                                    Icons
-                                                        .arrow_back_ios_rounded,
-                                                    size: touchWidth - 10,
-                                                  ),
-                                                ),
-                                              )))),
-                                  Visibility(
-                                      visible: isHighlighted,
-                                      child: Positioned(
-                                          left: _calculateRightTouch(),
-                                          top: 10,
-                                          child: GestureDetector(
-                                              onHorizontalDragUpdate:
-                                                  (details) {
-                                                adjustSubtitleEndTime(details);
-                                                setState(() {});
-                                              },
-                                              child: Container(
-                                                width: touchWidth,
-                                                height: widget.height,
-                                                decoration: BoxDecoration(
-                                                    color:
-                                                        widget.touchAreaColor,
-                                                    borderRadius:
-                                                        const BorderRadius.only(
-                                                            topRight:
-                                                                Radius.circular(
-                                                                    10),
-                                                            bottomRight:
-                                                                Radius.circular(
-                                                                    10))),
-                                                padding:
-                                                    const EdgeInsets.all(5.0),
-                                                child: Align(
-                                                  alignment: Alignment.center,
-                                                  child: Icon(
-                                                    Icons
-                                                        .arrow_forward_ios_rounded,
-                                                    color: Colors.white,
-                                                    size: touchWidth - 10,
-                                                  ),
-                                                ),
-                                              )))),
-                                ])))),
-                    //add a icon button at the center of highlighted subtitle
-                    Visibility(
-                        visible: isHighlighted,
-                        child: Positioned(
-                            left: _calculateLeftTouch() +
-                                _calculateSubtitleWidth() / 2,
-                            child: GestureDetector(
-                                onTap: () {
-                                  //delete the highlighted subtitle
-                                  widget.controller.deleteHighlightedSubtitle();
-                                  widget.controller.highlightSubtitle = null;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      shape: BoxShape.circle),
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: const Align(
-                                    alignment: Alignment.center,
-                                    child: Icon(
-                                      Icons.delete_forever,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                  ),
-                                )))),
-                  ]),
-                );
-              },
-            );
-          })),
+                          )))),
+            ]),
+          )),
       Center(
         child: Padding(
             padding: const EdgeInsets.only(top: 15),
@@ -400,29 +368,11 @@ class _SubtitleSliderState extends State<SubtitleSlider>
         child: GestureDetector(
           onTap: () {
             //set highlighted subtitle
-            if(!isHighlighted){
-              isHighlighted=true;
+            isHighlighted = !isHighlighted;
+            if (isHighlighted) {
               widget.controller.highlightSubtitle = subtitle;
-            }else {
-              //show a fullscreen widget to edit subtitle
-              showGeneralDialog(
-                context: context,
-                barrierColor: Colors.black12.withOpacity(0.6), // Background color
-                barrierDismissible: false,
-                barrierLabel: 'Dialog',
-                transitionDuration: Duration(milliseconds: 400),
-                pageBuilder: (context, __, ___) {
-                  return Center(
-                      child: SubtitleEditor(
-                      subtitle: subtitle,
-                      onSaved: () {
-                        setState(() {
-                        });
-                      },
-                  ),
-                  );
-                },
-              );
+            } else {
+              widget.controller.highlightSubtitle = null;
             }
             setState(() {});
           },

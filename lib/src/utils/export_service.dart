@@ -9,18 +9,18 @@ import 'package:ffmpeg_kit_flutter_video/statistics.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ExportService {
-
   static Future<void> dispose() async {
     final executions = await FFmpegKit.listSessions();
     if (executions.isNotEmpty) await FFmpegKit.cancel();
   }
 
- static Future<String> createTempSubtitleFile(String subtitleContent) async {
+  static Future<String> createTempSubtitleFile(String subtitleContent) async {
     final directory = await getApplicationCacheDirectory();
     final file = File('${directory.path}/temp_subtitles.srt');
     await file.writeAsString(subtitleContent);
     return file.path;
   }
+
   //generate the output generated video file path
   static Future<String> generateOutputPath() async {
     final directory = await getApplicationCacheDirectory();
@@ -28,26 +28,36 @@ class ExportService {
     return '${directory.path}/$outputName';
   }
 
-
-
-  static Future<FFmpegSession> exportVideoWithSubtitles(
-    {
+  //how to export sounds from video
+  static Future<FFmpegSession> exportAudio({
     required String videoPath,
-    required String subtitlePath,
     required String outputPath,
+    isCutOff = false,
     required void Function(File file) onCompleted,
     void Function(Object, StackTrace)? onError,
     void Function(Statistics)? onProgress,
   }) {
+    var command;
+    if(isCutOff){
+      // Cut off the video to 1 minute
+       command = [
+        '-i', videoPath,
+        '-vn',
+        '-t', '00:01:00',
+        '-y', // Add this flag to overwrite the existing file
+        outputPath
+      ];
+    }else {
+       command = [
+        '-i', videoPath,
+        '-vn',
+        '-y', // Add this flag to overwrite the existing file
+        outputPath
+      ];
+    }
 
-    final command = [
-      '-i', videoPath,
-      '-vf', "subtitles=$subtitlePath",
-      '-y', // Add this flag to overwrite the existing file
-      outputPath
-    ];    // log('FFmpeg start process with command = ${execute.command}');
     return FFmpegKit.executeWithArgumentsAsync(
-        command,
+      command,
       (session) async {
         final state =
             FFmpegKitConfig.sessionStateToString(await session.getState());
@@ -71,4 +81,42 @@ class ExportService {
     );
   }
 
+  static Future<FFmpegSession> exportVideoWithSubtitles({
+    required String videoPath,
+    required String subtitlePath,
+    required String outputPath,
+    required void Function(File file) onCompleted,
+    void Function(Object, StackTrace)? onError,
+    void Function(Statistics)? onProgress,
+  }) {
+    final command = [
+      '-i', videoPath,
+      '-vf', "subtitles=$subtitlePath",
+      '-y', // Add this flag to overwrite the existing file
+      outputPath
+    ]; // log('FFmpeg start process with command = ${execute.command}');
+    return FFmpegKit.executeWithArgumentsAsync(
+      command,
+      (session) async {
+        final state =
+            FFmpegKitConfig.sessionStateToString(await session.getState());
+        final code = await session.getReturnCode();
+
+        if (ReturnCode.isSuccess(code)) {
+          onCompleted(File(outputPath));
+        } else {
+          if (onError != null) {
+            onError(
+              Exception(
+                  'FFmpeg process exited with state $state and return code $code.\n${await session.getOutput()}'),
+              StackTrace.current,
+            );
+          }
+          return;
+        }
+      },
+      null,
+      onProgress,
+    );
+  }
 }

@@ -18,7 +18,7 @@ class VideoViewer extends StatelessWidget {
             controller.video.play();
           }
         },
-        child:  Container(
+        child: Container(
           width: controller.videoWidth,
           height: controller.videoHeight,
           child: Stack(children: [
@@ -53,7 +53,7 @@ class VideoViewer extends StatelessWidget {
                 )),
             if (child != null)
               Padding(
-                padding:  EdgeInsets.only(top: controller.videoHeight/2-50),
+                padding: EdgeInsets.only(top: controller.videoHeight / 2 - 50),
                 child: child,
               ),
           ]),

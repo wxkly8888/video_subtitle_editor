@@ -25,7 +25,6 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
 
   VideoSubtitleController get videoSubtitleController => widget.controller;
 
-
   Color? get backgroundColor => widget.backgroundColor;
 
   @override
@@ -37,6 +36,7 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
   _update() {
     setState(() {});
   }
+
   TextStyle get _textStyle {
     return subtitleStyle.hasBorder
         ? TextStyle(

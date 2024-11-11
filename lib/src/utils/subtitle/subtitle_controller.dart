@@ -21,7 +21,7 @@ abstract class ISubtitleController {
 
   ISubtitleController({
     required SubtitleProvider provider,
-  })   : _provider = provider,
+  })  : _provider = provider,
         subtitles = List.empty(growable: true);
 
   //! Getters

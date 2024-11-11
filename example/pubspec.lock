@@ -90,7 +90,7 @@ packages:
     source: hosted
     version: "0.2.1"
   ffmpeg_kit_flutter_video:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: ffmpeg_kit_flutter_video
       sha256: "86d2e56f0c9ad23350001dbe91a87f0a23ec5016353dd776cc087ecdb734539d"

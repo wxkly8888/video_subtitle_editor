@@ -38,7 +38,8 @@ class ScalePainter extends CustomPainter {
           text: Duration(seconds: i ~/ 2)
               .toString()
               .split('.')
-              .first.substring(2)
+              .first
+              .substring(2)
               .padLeft(5, '0'),
         );
         TextPainter tp = TextPainter(
@@ -48,7 +49,7 @@ class ScalePainter extends CustomPainter {
         );
         //calculate text span width
         tp.layout();
-        tp.paint(canvas, Offset(xPosition -tp.width/2, size.height - 22));
+        tp.paint(canvas, Offset(xPosition - tp.width / 2, size.height - 22));
       }
       // Draw the tick marks
       canvas.drawLine(

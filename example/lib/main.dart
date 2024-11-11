@@ -132,19 +132,14 @@ class _VideoEditorState extends State<VideoEditor> {
     _exportingProgress.value = 0;
     _isExporting.value = true;
     //how to generate a subtitle file base on _controller.subtitles
-    // final subtitlePath = await _controller.exportSubtitles();
     String content = _controller.generateSubtitleContent();
-    // print("subtitle Content: $content");
     var subtitlePath = await ExportService.createTempSubtitleFile(content);
-    print("subtitle path: $subtitlePath");
     var videoOutputPath = await ExportService.generateOutputPath();
-    print("subtitle video output path: $videoOutputPath");
     await ExportService.exportVideoWithSubtitles(
       videoPath: widget.videoFile.path,
       subtitlePath: subtitlePath,
       outputPath:videoOutputPath,
       onProgress: (stats) {
-        print("export onprogress: ${stats.getTime()}");
         _exportingProgress.value = getFFmpegProgress(stats.getTime());
       },
       onError: (e, s) {
@@ -154,7 +149,6 @@ class _VideoEditorState extends State<VideoEditor> {
         _showErrorSnackBar("Error on export video :( $e");
       },
       onCompleted: (file) {
-        print("export completed");
         _isExporting.value = false;
         if (!mounted) return;
         showDialog(

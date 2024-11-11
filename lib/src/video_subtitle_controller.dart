@@ -49,9 +49,9 @@ class VideoSubtitleController extends ChangeNotifier {
   /// The [videoFile] argument must not be null.
   VideoSubtitleController.file(this.videoFile)
       : _video = VideoPlayerController.file(File(
-    // https://github.com/flutter/flutter/issues/40429#issuecomment-549746165
-    Platform.isIOS ? Uri.encodeFull(videoFile.path) : videoFile.path,
-  ));
+          // https://github.com/flutter/flutter/issues/40429#issuecomment-549746165
+          Platform.isIOS ? Uri.encodeFull(videoFile.path) : videoFile.path,
+        ));
 
   ///get a pre subtitle of current subtitle
   ///if current subtitle is null, return null
