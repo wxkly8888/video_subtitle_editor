@@ -60,7 +60,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
   late double _horizontalMargin;
 
   ///is the subtitle highlighted in edit mode
-  bool isHighlighted = false;
+  bool get isHighlighted => widget.controller.highlightSubtitle != null;
 
   ///how many pixels per second should be scrolled as video is playing
   double speed = 1;
@@ -113,7 +113,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
         if (widget.controller.isPlaying) {
           widget.controller.video.pause();
         }
-        isHighlighted = false;
+        widget.controller.highlightSubtitle = null;
         _controllerSeekTo(_scrollController.offset);
       } else {}
     }
@@ -287,7 +287,6 @@ class _SubtitleSliderState extends State<SubtitleSlider>
               ],
             )),
       ),
-
     ]);
   }
   void _showFullscreenDialog(BuildContext context) {
@@ -384,18 +383,19 @@ class _SubtitleSliderState extends State<SubtitleSlider>
           onTap: () {
             //set highlighted subtitle
             if (isHighlighted) {
-              widget.controller.highlightSubtitle = subtitle;
-              _showFullscreenDialog(context);
+              if( widget.controller.highlightSubtitle == subtitle){
+                _showFullscreenDialog(context);
+              }else {
+                widget.controller.highlightSubtitle = subtitle;
+              }
               // Navigator.of(context).push(PageRouteBuilder(
               //     opaque: false,
               //     pageBuilder: (BuildContext context, _, __) {
               //
               //     }
               // ));
-
             } else {
-              isHighlighted = !isHighlighted;
-              widget.controller.highlightSubtitle = null;
+              widget.controller.highlightSubtitle = subtitle;
             }
             setState(() {});
           },

@@ -34,6 +34,7 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
   }
 
   _update() {
+    if(mounted)
     setState(() {});
   }
 

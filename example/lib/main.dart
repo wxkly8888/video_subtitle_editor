@@ -161,13 +161,16 @@ class _VideoEditorState extends State<VideoEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
+    return   GestureDetector(
+      onTap: () {
+        _controller.dismissHighlightedSubtitle();
+      },
       child: Scaffold(
         backgroundColor: Colors.black,
         body: _controller.initialized
             ? SafeArea(
-                child: Stack(
+                child:
+               Stack(
                   children: [
                     Column(
                       children: [
