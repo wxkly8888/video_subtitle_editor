@@ -206,7 +206,14 @@ class _VideoEditorState extends State<VideoEditor> {
                           ),
                         )
                       ],
-                    )
+                    ),
+                    //add a fullscreen touchable widget
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     _controller.dismissHighlightedSubtitle();
+                    //   },child: Container(color: Colors.transparent),
+                    // )
+
                   ],
                 ),
               )
