@@ -7,9 +7,7 @@ import 'package:video_subtitle_editor/src/utils/subtitle/subtitle_controller.dar
 import 'models/subtitle.dart';
 
 class VideoSubtitleController extends ChangeNotifier {
-  /// Video from [File].
-  final File videoFile;
-
+  final String dataSource;
   final VideoPlayerController _video;
 
   List<Subtitle> _subtitles = [];
@@ -45,14 +43,20 @@ class VideoSubtitleController extends ChangeNotifier {
   double get videoHeight => videoDimension.height;
 
   /// Constructs a [VideoSubtitleController] that edits a video from a file.
-  ///
-  /// The [videoFile] argument must not be null.
-  VideoSubtitleController.file(this.videoFile)
-      : _video = VideoPlayerController.file(File(
-          // https://github.com/flutter/flutter/issues/40429#issuecomment-549746165
-          Platform.isIOS ? Uri.encodeFull(videoFile.path) : videoFile.path,
-        ));
+  ///[dataSource] is the path of the video file.
+  VideoSubtitleController.file(this.dataSource)
+      : _video = VideoPlayerController.file(
+          File(
+              // https://github.com/flutter/flutter/issues/40429#issuecomment-549746165
+              Platform.isIOS ? Uri.encodeFull(dataSource) : dataSource),
+        );
 
+  /// Constructs a [VideoSubtitleController] that edits a video from asset.
+  ///
+  VideoSubtitleController.asset(this.dataSource)
+      : _video = VideoPlayerController.asset(
+          dataSource,
+        );
   ///get a pre subtitle of current subtitle
   ///if current subtitle is null, return null
   Subtitle? getPreSubtitle() {
@@ -79,6 +83,7 @@ class VideoSubtitleController extends ChangeNotifier {
     }
     return _subtitles[index + 1];
   }
+
   dismissHighlightedSubtitle() {
     highlightSubtitle = null;
     notifyListeners();

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 import 'widgets/export_result.dart';
 
@@ -33,15 +34,25 @@ class VideoEditorExample extends StatefulWidget {
 class _VideoEditorExampleState extends State<VideoEditorExample> {
   final ImagePicker _picker = ImagePicker();
 
-  void _pickVideo() async {
-    final XFile? file = await _picker.pickVideo(source: ImageSource.gallery);
+  void _pickVideo(isUseDemo) async {
+    if (!isUseDemo) {
+      final XFile? file = await _picker.pickVideo(source: ImageSource.gallery);
 
-    if (mounted && file != null) {
+      if (mounted && file != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) =>
+                VideoEditor(sourceType: DataSourceType.file,filePath: file.path),
+          ),
+        );
+      }
+    } else {
+
       Navigator.push(
         context,
         MaterialPageRoute<void>(
-          builder: (BuildContext context) =>
-              VideoEditor(videoFile: File(file.path)),
+          builder: (BuildContext context) => VideoEditor(sourceType: DataSourceType.asset,filePath:"assets/test.mp4"),
         ),
       );
     }
@@ -57,8 +68,16 @@ class _VideoEditorExampleState extends State<VideoEditorExample> {
           children: [
             const Text("Click on the button to select video"),
             ElevatedButton(
-              onPressed: _pickVideo,
+              onPressed: () {
+                _pickVideo(false);
+              },
               child: const Text("Pick Video From Gallery"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _pickVideo(true);
+              },
+              child: const Text("Add demo Video"),
             ),
           ],
         ),
@@ -71,10 +90,10 @@ class _VideoEditorExampleState extends State<VideoEditorExample> {
 //VIDEO EDITOR SCREEN//
 //-------------------//
 class VideoEditor extends StatefulWidget {
-  const VideoEditor({super.key, required this.videoFile});
+  const VideoEditor({super.key,  required this.sourceType, required this.filePath});
 
-  final File videoFile;
-
+  final String filePath;
+ final DataSourceType sourceType;
   @override
   State<VideoEditor> createState() => _VideoEditorState();
 }
@@ -82,21 +101,23 @@ class VideoEditor extends StatefulWidget {
 class _VideoEditorState extends State<VideoEditor> {
   final _exportingProgress = ValueNotifier<double>(0.0);
   final _isExporting = ValueNotifier<bool>(false);
-  late final VideoSubtitleController _controller = VideoSubtitleController.file(
-    widget.videoFile,
-  );
+  late VideoSubtitleController _controller;
 
   @override
   void initState() {
     super.initState();
+    if(widget.sourceType == DataSourceType.file) {
+      _controller = VideoSubtitleController.file(widget.filePath);
+    }else if(widget.sourceType == DataSourceType.asset) {
+      _controller = VideoSubtitleController.asset(widget.filePath);
+    }
     var subtitlePath = "assets/test.srt";
     var controller = SubtitleController(
       provider: AssetSubtitle(subtitlePath),
     );
     _controller
         .initializeVideo()
-        .then((_) =>
-        setState(() {}))
+        .then((_) => setState(() {}))
         .catchError((error) {});
     _controller.initialSubtitles(controller);
     _controller.addListener(
@@ -122,6 +143,7 @@ class _VideoEditorState extends State<VideoEditor> {
           duration: const Duration(seconds: 10),
         ),
       );
+
   double getFFmpegProgress(double time) {
     final double progressValue =
         time / _controller.videoPosition.inMilliseconds;
@@ -136,9 +158,9 @@ class _VideoEditorState extends State<VideoEditor> {
     var subtitlePath = await ExportService.createTempSubtitleFile(content);
     var videoOutputPath = await ExportService.generateOutputPath();
     await ExportService.exportVideoWithSubtitles(
-      videoPath: widget.videoFile.path,
+      videoPath: widget.filePath,
       subtitlePath: subtitlePath,
-      outputPath:videoOutputPath,
+      outputPath: videoOutputPath,
       onProgress: (stats) {
         _exportingProgress.value = getFFmpegProgress(stats.getTime());
       },
@@ -161,7 +183,7 @@ class _VideoEditorState extends State<VideoEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return   GestureDetector(
+    return GestureDetector(
       onTap: () {
         _controller.dismissHighlightedSubtitle();
       },
@@ -169,15 +191,13 @@ class _VideoEditorState extends State<VideoEditor> {
         backgroundColor: Colors.black,
         body: _controller.initialized
             ? SafeArea(
-                child:
-               Stack(
+                child: Stack(
                   children: [
                     Column(
                       children: [
                         _topNavBar(),
                         Expanded(
-                          child:
-                              buildVideoView(_controller),
+                          child: buildVideoView(_controller),
                         ),
                         Text(
                           "${formatter(_controller.videoPosition)}/${formatter(_controller.videoDuration)}",
@@ -216,7 +236,6 @@ class _VideoEditorState extends State<VideoEditor> {
                     //     _controller.dismissHighlightedSubtitle();
                     //   },child: Container(color: Colors.transparent),
                     // )
-
                   ],
                 ),
               )

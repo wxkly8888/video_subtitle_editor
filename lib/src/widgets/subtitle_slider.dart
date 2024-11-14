@@ -297,7 +297,8 @@ class _SubtitleSliderState extends State<SubtitleSlider>
         child:SubtitleEditor(
           subtitle: widget.controller.highlightSubtitle!,
           onSaved: () {
-            setState(() {});
+            setState(() {}
+            );
           },
       ),
     ));
