@@ -12,10 +12,11 @@ subtitle export, and related UI components for Flutter.
 
 Following steps will help you add this library as a dependency in your flutter project.
 
-- Run `flutter pub add video_editor`, or add video_editor to `pubspec.yaml` file manually.
+- Run `flutter pub add video_subtitle_editor`, or add video_editor to `pubspec.yaml` file manually.
 
 ```yaml
 dependencies:
+  video_subtitle_editor: ^1.0.0
 ```
 
 - Import the package in your code:
@@ -31,9 +32,8 @@ import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 | ![](./assets/subtitle_slider.PNG) | ![](./assets/subtitle_edit_page.jpeg) |
 
 ## 👀 Usage
-
+### 1. Init subtitle controller, you can init with file or assets
 ```dart
- ### 1. Init subtitle controller
   late final VideoSubtitleController _controller = VideoSubtitleController.file(
   widget.videoFile,
   );
@@ -43,50 +43,46 @@ void initState() {
   super.initState();
   @override
   void initState() {
-super.initState();
-var subtitlePath = "assets/test.srt";
-var controller = SubtitleController(
-provider: AssetSubtitle(subtitlePath),
-);
-_controller
+    super.initState();
+    var subtitlePath = "assets/test.srt";
+    var controller = SubtitleController(
+      provider: AssetSubtitle(subtitlePath),
+    );
+    _controller
     .initializeVideo()
     .then((_) =>
-setState(() {}))
+      setState(() {}))
     .catchError((error) {});
-_controller.initialSubtitles(controller);
-_controller.addListener(
-() {
-setState(() {});
-},
-);
-}
-}
+    _controller.initialSubtitles(controller);
+    _controller.addListener(
+        () {
+          setState(() {});
+          },
+      );
+    }
+    }
 
 @override
 void dispose() {
   _controller.dispose();
   super.dispose();
 }
+```
 
- 2. add video viewer
+### 2. add video viewer into you widget tree
+```dart
  VideoViewer(
     controller: controller,
     child: SubtitleTextView(
     controller: controller,
     ),
   );
-
- 3. add subtitle viewer
+```
+### 3. add subtitle viewer
+```dart
   SubtitleSlider(
     height: 100,
     controller: _controller,
-  ),
- 4. add subtitle export button
-  ElevatedButton(
-  onPressed: () async {
-  await _controller.exportVideo();
-  },
-  child: Text('Export'),
   ),
 ```
 
