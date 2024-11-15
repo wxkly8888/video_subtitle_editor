@@ -1,7 +1,7 @@
 name: video_subtitle_editor
-description: "This is a video subtitle editing library that includes subtitle generation, subtitle editing,
+description: "A video subtitle editing library that includes subtitle generation, subtitle editing,
  subtitle export, and related UI components."
-version: 1.0.0
+version: 1.0.2
 homepage: https://github.com/wxkly8888/video_subtitle_editor
 
 

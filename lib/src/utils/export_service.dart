@@ -32,15 +32,27 @@ class ExportService {
     required String videoPath,
     required String outputPath,
     required void Function(File file) onCompleted,
+    Duration? startTime,
+    Duration? endTime,
     void Function(Object, StackTrace)? onError,
     void Function(Statistics)? onProgress,
   }) {
     var command = [
-        '-i', videoPath,
-        '-vn',
-        '-y', // Add this flag to overwrite the existing file
-        outputPath
-      ];
+      '-i', videoPath,
+      '-vn',
+      '-y', // Add this flag to overwrite the existing file
+    ];
+    // Add start time if provided
+    if (startTime != null) {
+      command.addAll(['-ss', startTime.inSeconds.toString()]);
+    }
+
+    // Add end time if provided
+    if (endTime != null) {
+      command.addAll(['-to', endTime.inSeconds.toString()]);
+    }
+    // Specify the output path
+    command.add(outputPath);
     return FFmpegKit.executeWithArgumentsAsync(
       command,
       (session) async {

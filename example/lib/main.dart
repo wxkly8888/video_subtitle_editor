@@ -42,17 +42,17 @@ class _VideoEditorExampleState extends State<VideoEditorExample> {
         Navigator.push(
           context,
           MaterialPageRoute<void>(
-            builder: (BuildContext context) =>
-                VideoEditor(sourceType: DataSourceType.file,filePath: file.path),
+            builder: (BuildContext context) => VideoEditor(
+                sourceType: DataSourceType.file, filePath: file.path),
           ),
         );
       }
     } else {
-
       Navigator.push(
         context,
         MaterialPageRoute<void>(
-          builder: (BuildContext context) => VideoEditor(sourceType: DataSourceType.asset,filePath:"assets/test.mp4"),
+          builder: (BuildContext context) => VideoEditor(
+              sourceType: DataSourceType.asset, filePath: "assets/test.mp4"),
         ),
       );
     }
@@ -90,10 +90,11 @@ class _VideoEditorExampleState extends State<VideoEditorExample> {
 //VIDEO EDITOR SCREEN//
 //-------------------//
 class VideoEditor extends StatefulWidget {
-  const VideoEditor({super.key,  required this.sourceType, required this.filePath});
+  const VideoEditor(
+      {super.key, required this.sourceType, required this.filePath});
 
   final String filePath;
- final DataSourceType sourceType;
+  final DataSourceType sourceType;
   @override
   State<VideoEditor> createState() => _VideoEditorState();
 }
@@ -106,9 +107,9 @@ class _VideoEditorState extends State<VideoEditor> {
   @override
   void initState() {
     super.initState();
-    if(widget.sourceType == DataSourceType.file) {
+    if (widget.sourceType == DataSourceType.file) {
       _controller = VideoSubtitleController.file(widget.filePath);
-    }else if(widget.sourceType == DataSourceType.asset) {
+    } else if (widget.sourceType == DataSourceType.asset) {
       _controller = VideoSubtitleController.asset(widget.filePath);
     }
     var subtitlePath = "assets/test.srt";
