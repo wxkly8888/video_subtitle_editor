@@ -13,7 +13,8 @@ class SubtitleEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controller = TextEditingController(text: subtitle.data);
+    final TextEditingController controller =
+        TextEditingController(text: subtitle.data);
     final FocusNode focusNode = FocusNode();
 
     // Request focus after the widget is built
@@ -28,7 +29,8 @@ class SubtitleEditor extends StatelessWidget {
           // Add a delete button on the top right corner
 
           Expanded(
-            child:Center(child:  Padding(
+            child: Center(
+                child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: controller,

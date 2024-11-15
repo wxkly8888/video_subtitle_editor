@@ -1,8 +1,9 @@
 # Flutter subtitle editor
 
 
-A video subtitle editing library that includes subtitle generation, subtitle editing,
-subtitle export, and related UI components for Flutter.
+About
+A comprehensive video subtitle editing library offering tools for subtitle editing,
+export, and a suite of UI components.
 
 |             | Android | iOS   |
 |-------------|---------|-------|
@@ -12,7 +13,7 @@ subtitle export, and related UI components for Flutter.
 
 Following steps will help you add this library as a dependency in your flutter project.
 
-- Run `flutter pub add video_subtitle_editor`, or add video_editor to `pubspec.yaml` file manually.
+- Run `flutter pub add video_subtitle_editor`, or add video_subtitle_editor to `pubspec.yaml` file manually.
 
 ```yaml
 dependencies:
@@ -32,7 +33,7 @@ import 'package:video_subtitle_editor/video_subtitle_editor.dart';
 | ![](./assets/subtitle_slider.PNG) | ![](./assets/subtitle_edit_page.jpeg) |
 
 ## 👀 Usage
-### 1. Init subtitle controller, you can init with file or assets
+### 1. Init controller, you can init a [VideoSubtitleController] controller with a video file from local or from assets
 ```dart
   late final VideoSubtitleController _controller = VideoSubtitleController.file(
   widget.videoFile,
@@ -69,7 +70,7 @@ void dispose() {
 }
 ```
 
-### 2. add video viewer into you widget tree
+### 2. add video viewer [VideoViewer] into you widget tree, [SubtitleTextView] is the widget to show subtitle text
 ```dart
  VideoViewer(
     controller: controller,
@@ -78,7 +79,7 @@ void dispose() {
     ),
   );
 ```
-### 3. add subtitle viewer
+### 3. add subtitle slider. this widget is used to slide the subtitle text to adjust the subtitle time
 ```dart
   SubtitleSlider(
     height: 100,

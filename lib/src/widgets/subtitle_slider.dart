@@ -143,6 +143,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     final startX = (_sliderWidth * start) / duration;
     return startX;
   }
+
   @override
   Widget build(BuildContext context) {
     _horizontalMargin = MediaQuery.of(context).size.width / 2;
@@ -289,20 +290,21 @@ class _SubtitleSliderState extends State<SubtitleSlider>
       ),
     ]);
   }
+
   void _showFullscreenDialog(BuildContext context) {
     showDialog(
-      context: context,
-      builder: (_) => Material(
-        type: MaterialType.transparency,
-        child:SubtitleEditor(
-          subtitle: widget.controller.highlightSubtitle!,
-          onSaved: () {
-            setState(() {}
-            );
-          },
-      ),
-    ));
+        context: context,
+        builder: (_) => Material(
+              type: MaterialType.transparency,
+              child: SubtitleEditor(
+                subtitle: widget.controller.highlightSubtitle!,
+                onSaved: () {
+                  setState(() {});
+                },
+              ),
+            ));
   }
+
   double _calculateDeleteBtnStartX() {
     if (widget.controller.highlightSubtitle == null) return 0.0;
     return computeStartX(widget.controller.highlightSubtitle!) +
@@ -384,9 +386,9 @@ class _SubtitleSliderState extends State<SubtitleSlider>
           onTap: () {
             //set highlighted subtitle
             if (isHighlighted) {
-              if( widget.controller.highlightSubtitle == subtitle){
+              if (widget.controller.highlightSubtitle == subtitle) {
                 _showFullscreenDialog(context);
-              }else {
+              } else {
                 widget.controller.highlightSubtitle = subtitle;
               }
               // Navigator.of(context).push(PageRouteBuilder(
@@ -415,9 +417,10 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                       width: 2,
                     ))
                   : null,
-              borderRadius:
-                  isHighlighted&&
-                      subtitle == widget.controller.highlightSubtitle ? BorderRadius.zero : BorderRadius.circular(10),
+              borderRadius: isHighlighted &&
+                      subtitle == widget.controller.highlightSubtitle
+                  ? BorderRadius.zero
+                  : BorderRadius.circular(10),
             ),
             padding: const EdgeInsets.all(5.0),
             child: Align(

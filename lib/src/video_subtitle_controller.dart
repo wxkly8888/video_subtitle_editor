@@ -57,6 +57,7 @@ class VideoSubtitleController extends ChangeNotifier {
       : _video = VideoPlayerController.asset(
           dataSource,
         );
+
   ///get a pre subtitle of current subtitle
   ///if current subtitle is null, return null
   Subtitle? getPreSubtitle() {
