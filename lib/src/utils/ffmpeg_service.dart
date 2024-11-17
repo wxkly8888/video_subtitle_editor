@@ -7,7 +7,7 @@ import 'package:ffmpeg_kit_flutter_video/return_code.dart';
 import 'package:ffmpeg_kit_flutter_video/statistics.dart';
 import 'package:path_provider/path_provider.dart';
 
-class ExportService {
+class FFmpegService {
   static Future<void> dispose() async {
     final executions = await FFmpegKit.listSessions();
     if (executions.isNotEmpty) await FFmpegKit.cancel();
@@ -25,6 +25,44 @@ class ExportService {
     final directory = await getApplicationCacheDirectory();
     const outputName = 'subtitled.mp4';
     return '${directory.path}/$outputName';
+  }
+  static Future<FFmpegSession> generateThumbnail({
+    required String videoPath,
+    required String outputPath,
+    required void Function(File file) onCompleted,
+    void Function(Object, StackTrace)? onError,
+    void Function(Statistics)? onProgress,
+  }) {
+    final command = [
+      '-i', videoPath,
+      '-ss', '00:00:01',
+      '-vframes', '1',
+      '-y', // Add this flag to overwrite the existing file
+      outputPath
+    ];
+    return FFmpegKit.executeWithArgumentsAsync(
+      command,
+      (session) async {
+        final state =
+            FFmpegKitConfig.sessionStateToString(await session.getState());
+        final code = await session.getReturnCode();
+
+        if (ReturnCode.isSuccess(code)) {
+          onCompleted(File(outputPath));
+        } else {
+          if (onError != null) {
+            onError(
+              Exception(
+                  'FFmpeg process exited with state $state and return code $code.\n${await session.getOutput()}'),
+              StackTrace.current,
+            );
+          }
+          return;
+        }
+      },
+      null,
+      onProgress,
+    );
   }
 
   //how to export sounds from video

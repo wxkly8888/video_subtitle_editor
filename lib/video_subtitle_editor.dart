@@ -5,6 +5,6 @@ export 'src/widgets/video_viewer.dart';
 export 'src/widgets/subtitle_text_view.dart';
 export 'src/utils/subtitle/subtitle_controller.dart';
 export 'src/utils/subtitle/subtitle_provider.dart';
-export 'src/utils/export_service.dart';
+export 'src/utils/ffmpeg_service.dart';
 export 'src/utils/subtitle/types.dart';
 export 'src/widgets/subtitle_slider.dart';

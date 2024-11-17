@@ -156,9 +156,9 @@ class _VideoEditorState extends State<VideoEditor> {
     _isExporting.value = true;
     //how to generate a subtitle file base on _controller.subtitles
     String content = _controller.generateSubtitleContent();
-    var subtitlePath = await ExportService.createTempSubtitleFile(content);
-    var videoOutputPath = await ExportService.generateOutputPath();
-    await ExportService.exportVideoWithSubtitles(
+    var subtitlePath = await FFmpegService.createTempSubtitleFile(content);
+    var videoOutputPath = await FFmpegService.generateOutputPath();
+    await FFmpegService.exportVideoWithSubtitles(
       videoPath: widget.filePath,
       subtitlePath: subtitlePath,
       outputPath: videoOutputPath,
