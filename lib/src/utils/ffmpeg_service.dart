@@ -26,6 +26,7 @@ class FFmpegService {
     const outputName = 'subtitled.mp4';
     return '${directory.path}/$outputName';
   }
+
   static Future<FFmpegSession> generateThumbnail({
     required String videoPath,
     required String outputPath,
