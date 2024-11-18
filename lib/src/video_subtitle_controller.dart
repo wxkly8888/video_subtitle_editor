@@ -91,6 +91,9 @@ class VideoSubtitleController extends ChangeNotifier {
   }
 
   deleteHighlightedSubtitle() {
+    if(highlightSubtitle == null) {
+      return;
+    }
     _subtitles.remove(highlightSubtitle);
     highlightSubtitle = null;
     notifyListeners();

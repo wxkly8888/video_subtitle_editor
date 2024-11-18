@@ -11,28 +11,36 @@ class VideoViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          if (controller.video.value.isPlaying) {
-            controller.video.pause();
-          } else {
-            controller.video.play();
-          }
-        },
-        child: SizedBox(
-          width: controller.videoWidth,
-          height: controller.videoHeight,
-          child: Stack(children: [
-            Align(
-                alignment: Alignment.center,
-                child: AspectRatio(
-                  aspectRatio: controller.video.value.aspectRatio,
-                  child: VideoPlayer(controller.video),
-                )),
-            Align(
-                alignment: Alignment.center,
-                child: AnimatedBuilder(
-                  animation: controller.video,
-                  builder: (_, __) => AnimatedOpacity(
+      onTap: () {
+        print("tap video called");
+        controller.dismissHighlightedSubtitle();
+        if (controller.video.value.isPlaying) {
+          controller.video.pause();
+        } else {
+          controller.video.play();
+        }
+      },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+         final screenWidth = constraints.maxWidth;
+          final videoHeight = screenWidth / controller.video.value.aspectRatio;
+          return SizedBox(
+            width: screenWidth,
+            height: videoHeight,
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: AspectRatio(
+                    aspectRatio: controller.video.value.aspectRatio,
+                    child: VideoPlayer(controller.video),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: AnimatedBuilder(
+                    animation: controller.video,
+                    builder: (_, __) => AnimatedOpacity(
                       opacity: controller.isPlaying ? 0 : 1,
                       duration: kThemeAnimationDuration,
                       child: GestureDetector(
@@ -53,10 +61,10 @@ class VideoViewer extends StatelessWidget {
                 )),
             if (child != null)
               Padding(
-                padding: EdgeInsets.only(top: controller.videoHeight / 2 - 50),
+                padding: EdgeInsets.only(top: controller.videoHeight / 2 - 20),
                 child: child,
               ),
           ]),
-        ));
+        );}));
   }
 }
