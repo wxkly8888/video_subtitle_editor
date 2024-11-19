@@ -10,6 +10,10 @@ class VideoViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //get screen width
+    var screenWidth = MediaQuery.of(context).size.width;
+    final videoHeight = screenWidth / controller.video.value.aspectRatio;
+    print("videoHeight: $videoHeight videoWidth: $screenWidth");
     return GestureDetector(
       onTap: () {
         print("tap video called");
@@ -22,8 +26,7 @@ class VideoViewer extends StatelessWidget {
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
-         final screenWidth = constraints.maxWidth;
-          final videoHeight = screenWidth / controller.video.value.aspectRatio;
+
           return SizedBox(
             width: screenWidth,
             height: videoHeight,
@@ -61,7 +64,7 @@ class VideoViewer extends StatelessWidget {
                 )),
             if (child != null)
               Padding(
-                padding: EdgeInsets.only(top: controller.videoHeight / 2 - 20),
+                padding: EdgeInsets.only(top: videoHeight -30 ),
                 child: child,
               ),
           ]),
