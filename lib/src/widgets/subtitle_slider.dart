@@ -223,7 +223,6 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                                         top: 10,
                                         child: GestureDetector(
                                             onHorizontalDragUpdate: (details) {
-
                                               adjustSubtitleEndTime(details);
                                               setState(() {});
                                             },
