@@ -25,7 +25,8 @@ class VideoViewer extends StatelessWidget {
     }, child: LayoutBuilder(builder: (context, constraints) {
       return SizedBox(
         width: screenWidth,
-        height: videoHeight,
+        //we added a buffer to the height to make sure the video is not cropped
+        height: videoHeight + 100,
         child: Stack(children: [
           Align(
             alignment: Alignment.center,
