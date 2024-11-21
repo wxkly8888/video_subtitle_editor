@@ -60,12 +60,9 @@ class VideoSubtitleController extends ChangeNotifier {
 
   ///get a pre subtitle of current subtitle
   ///if current subtitle is null, return null
-  Subtitle? getPreSubtitle() {
-    if (highlightSubtitle == null) {
-      return null;
-    }
-    int index = _subtitles.indexOf(highlightSubtitle!);
-    if (index == 0) {
+  Subtitle? getPreSubtitle(Subtitle subtitle) {
+    int index = _subtitles.indexOf(subtitle);
+    if (index <= 0) {
       return null;
     }
     return _subtitles[index - 1];
@@ -74,12 +71,9 @@ class VideoSubtitleController extends ChangeNotifier {
   ///get a next subtitle of current subtitle
   ///if current subtitle is null, return null
   ///if current subtitle is the last subtitle, return null
-  Subtitle? getNextSubtitle() {
-    if (highlightSubtitle == null) {
-      return null;
-    }
-    int index = _subtitles.indexOf(highlightSubtitle!);
-    if (index == _subtitles.length - 1) {
+  Subtitle? getNextSubtitle(Subtitle subtitle) {
+    int index = _subtitles.indexOf(subtitle);
+    if (index >= _subtitles.length - 1) {
       return null;
     }
     return _subtitles[index + 1];
@@ -134,6 +128,10 @@ class VideoSubtitleController extends ChangeNotifier {
     return buffer.toString();
   }
 
+  addSubtitle(Subtitle subtitle,int index){
+    _subtitles.insert(index, subtitle);
+    notifyListeners();
+  }
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String threeDigits(int n) => n.toString().padLeft(3, '0');

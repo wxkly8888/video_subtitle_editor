@@ -305,14 +305,18 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     ]);
   }
 
-  void _showFullscreenDialog(BuildContext context) {
+  void _showFullscreenDialog(BuildContext context, Subtitle editSubtitle,
+      {bool isAdded = false, int index = -1}) {
     showDialog(
         context: context,
         builder: (_) => Material(
               type: MaterialType.transparency,
               child: SubtitleEditor(
-                subtitle: widget.controller.highlightSubtitle!,
+                subtitle: editSubtitle,
                 onSaved: () {
+                  if (isAdded) {
+                    widget.controller.addSubtitle(editSubtitle, index);
+                  }
                   setState(() {});
                 },
               ),
@@ -349,102 +353,141 @@ class _SubtitleSliderState extends State<SubtitleSlider>
   /// Adjust the subtitle start time based on the drag details
   /// @param details: the drag details
   adjustSubtitleStartTime(DragUpdateDetails details) {
-    if (widget.controller.highlightSubtitle == null) return;
+    Subtitle? highlightSubtitle = widget.controller.highlightSubtitle;
+    if (highlightSubtitle == null) return;
     double offsetX =
         (details.primaryDelta ?? 0) / (_sliderWidth + _horizontalMargin * 2);
 
     final to = widget.controller.videoDuration * offsetX;
-    if (widget.controller.highlightSubtitle != null) {
-      var adjustStartX = widget.controller.highlightSubtitle!.start + to;
-      //check if start time is less than pre subtitle end time
-      if (adjustStartX <=
-          (widget.controller.getPreSubtitle()?.end ??
-              const Duration(seconds: 0))) {
-        adjustStartX = widget.controller.getPreSubtitle()?.end ??
-            const Duration(seconds: 0);
-      }
-      widget.controller.highlightSubtitle!.start = adjustStartX;
+    var adjustStartX = highlightSubtitle.start + to;
+    //check if start time is less than pre subtitle end time
+    if (adjustStartX <=
+        (widget.controller.getPreSubtitle(highlightSubtitle)?.end ??
+            const Duration(seconds: 0))) {
+      adjustStartX = widget.controller.getPreSubtitle(highlightSubtitle)?.end ??
+          const Duration(seconds: 0);
     }
+    highlightSubtitle.start = adjustStartX;
   }
 
   /// Adjust the subtitle end time based on the drag details
   /// @param details: the drag details
   adjustSubtitleEndTime(DragUpdateDetails details) {
-    if (widget.controller.highlightSubtitle == null) return;
+    Subtitle? highlightSubtitle = widget.controller.highlightSubtitle;
+    if (highlightSubtitle == null) return;
     double offsetX =
         (details.primaryDelta ?? 0) / (_sliderWidth + _horizontalMargin * 2);
     final to = widget.controller.videoDuration * offsetX;
-    if (widget.controller.highlightSubtitle != null) {
-      var adjustEndX = widget.controller.highlightSubtitle!.end + to;
-      //check if end time is greater than next subtitle start time
-      if (adjustEndX >=
-          (widget.controller.getNextSubtitle()?.start ??
-              widget.controller.videoDuration)) {
-        adjustEndX = widget.controller.getNextSubtitle()?.start ??
-            widget.controller.videoDuration;
-      }
-      widget.controller.highlightSubtitle!.end = adjustEndX;
+    var adjustEndX = highlightSubtitle.end + to;
+    //check if end time is greater than next subtitle start time
+    if (adjustEndX >=
+        (widget.controller.getNextSubtitle(highlightSubtitle)?.start ??
+            widget.controller.videoDuration)) {
+      adjustEndX =
+          widget.controller.getNextSubtitle(highlightSubtitle)?.start ??
+              widget.controller.videoDuration;
     }
+    highlightSubtitle.end = adjustEndX;
   }
 
   _buildSingleSubtitle(Subtitle subtitle) {
+    final index = widget.controller.subtitles.indexOf(subtitle);
+    Subtitle? nextSubtitle = widget.controller.getNextSubtitle(subtitle);
     double width = computeWidth(subtitle);
     double startX = computeStartX(subtitle);
+    double spaceToNextSubtitle = 0;
+    double addedIconStartX = 0;
+    double iconSize = 30;
+    double minToAllowAddIcon = 50;
+    bool showAddedIcon = false;
+    if (index < widget.controller.subtitles.length - 1) {
+      spaceToNextSubtitle =
+          computeStartX(widget.controller.subtitles[index + 1]) -
+              (startX + width);
+    }
 
-    return Positioned(
-        left: startX,
-        top: 10,
-        child: GestureDetector(
-          onTap: () {
-            //set highlighted subtitle
-            if (isHighlighted) {
-              if (widget.controller.highlightSubtitle == subtitle) {
-                _showFullscreenDialog(context);
+    if (spaceToNextSubtitle > minToAllowAddIcon) {
+      showAddedIcon = true;
+      addedIconStartX = startX + width + spaceToNextSubtitle / 2 - iconSize / 2;
+    }
+
+    return Stack(
+      children: [
+        Positioned(
+          left: startX,
+          top: 10,
+          child: GestureDetector(
+            onTap: () {
+              if (isHighlighted) {
+                if (widget.controller.highlightSubtitle == subtitle) {
+                  _showFullscreenDialog(context, subtitle);
+                } else {
+                  widget.controller.highlightSubtitle = subtitle;
+                }
               } else {
+                widget.controller.video.pause();
                 widget.controller.highlightSubtitle = subtitle;
               }
-              // Navigator.of(context).push(PageRouteBuilder(
-              //     opaque: false,
-              //     pageBuilder: (BuildContext context, _, __) {
-              //
-              //     }
-              // ));
-            } else {
-              widget.controller.video.pause();
-              widget.controller.highlightSubtitle = subtitle;
-            }
-            setState(() {});
-          },
-          child:
-              //add left arrow
-              Container(
-            width: width,
-            height: widget.height,
-            decoration: BoxDecoration(
-              color: widget.subtitleBackgroundColor,
-              border: isHighlighted &&
-                      subtitle == widget.controller.highlightSubtitle
-                  ? Border.symmetric(
-                      horizontal: BorderSide(
-                      color: widget.touchAreaColor,
-                      width: 2,
-                    ))
-                  : null,
-              borderRadius: isHighlighted &&
-                      subtitle == widget.controller.highlightSubtitle
-                  ? BorderRadius.zero
-                  : BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.all(5.0),
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                subtitle.data,
-                style: widget.subtitleTextStyle,
+              setState(() {});
+            },
+            child: Container(
+              width: width,
+              height: widget.height,
+              decoration: BoxDecoration(
+                color: widget.subtitleBackgroundColor,
+                border: isHighlighted &&
+                        subtitle == widget.controller.highlightSubtitle
+                    ? Border.symmetric(
+                        horizontal: BorderSide(
+                          color: widget.touchAreaColor,
+                          width: 2,
+                        ),
+                      )
+                    : null,
+                borderRadius: isHighlighted &&
+                        subtitle == widget.controller.highlightSubtitle
+                    ? BorderRadius.zero
+                    : BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.all(5.0),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  subtitle.data,
+                  style: widget.subtitleTextStyle,
+                ),
               ),
             ),
           ),
-          //add left arrow
-        ));
+        ),
+        if (index < widget.controller.subtitles.length - 1 && showAddedIcon)
+          Positioned(
+            left: addedIconStartX,
+            top: widget.height / 2 - iconSize / 2 + 10,
+            child: GestureDetector(
+              onTap: () {
+                // Add your logic to add a new subtitle here
+                Subtitle newSubtitle = Subtitle(
+                    start: Duration(
+                        milliseconds: subtitle.end.inMilliseconds + 100),
+                    end: Duration(
+                        milliseconds: nextSubtitle != null? nextSubtitle.start.inMilliseconds-100 :
+                            subtitle.end.inMilliseconds + 1000),
+                    data: "New Subtitle",
+                    index: subtitle.index + 1);
+                _showFullscreenDialog(context, newSubtitle,
+                    isAdded: true, index: index + 1);
+              },
+              child: Align(
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.add_circle,
+                    color: Colors.white,
+                    size: iconSize,
+                  )),
+            ),
+          ),
+      ],
+    );
   }
 }
