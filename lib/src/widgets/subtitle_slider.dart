@@ -12,6 +12,8 @@ class SubtitleSlider extends StatefulWidget {
   const SubtitleSlider({
     super.key,
     required this.controller,
+    this.onSaved,
+    this.onDeleted,
     this.height = 100,
     this.subtitleBackgroundColor = const Color(0xFF974836),
     this.touchAreaColor = Colors.grey,
@@ -24,7 +26,10 @@ class SubtitleSlider extends StatefulWidget {
   });
 
   final VideoSubtitleController controller;
-
+  ///called when a subtitle is saved
+  final Function()? onSaved;
+  ///called when a subtitle is deleted
+  final Function()? onDeleted;
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
   final Color baselineColor;
@@ -263,6 +268,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                                 //delete the highlighted subtitle
                                 widget.controller.deleteHighlightedSubtitle();
                                 widget.controller.highlightSubtitle = null;
+                                if(widget.onDeleted != null) widget.onDeleted!();
                                 setState(() {});
                               },
                               child: Container(
@@ -316,6 +322,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                 onSaved: () {
                   if (isAdded) {
                     widget.controller.addSubtitle(editSubtitle, index);
+                    if(widget.onSaved != null) widget.onSaved!();
                   }
                   setState(() {});
                 },
@@ -396,11 +403,11 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     double currentScrollOffset = _scrollController.offset;
     return horizontalMargin + currentScrollOffset;
   }
-   showAddNewSubtitleView(Subtitle subtitle, Subtitle? nextSubtitle, int index) {
+
+  showAddNewSubtitleView(Subtitle subtitle, Subtitle? nextSubtitle, int index) {
     // Add your logic to add a new subtitle here
     Subtitle newSubtitle = Subtitle(
-        start: Duration(
-            milliseconds: subtitle.end.inMilliseconds + 100),
+        start: Duration(milliseconds: subtitle.end.inMilliseconds + 100),
         end: Duration(
             milliseconds: nextSubtitle != null
                 ? nextSubtitle.start.inMilliseconds - 100
@@ -510,7 +517,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                       width: spaceToNextSubtitle - 10,
                       height: widget.height,
                       decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.5),
+                          color: const Color(0xFF1F1E1E).withOpacity(0.5),
                           borderRadius: BorderRadius.circular(10)),
                       padding: const EdgeInsets.all(5.0),
                     ),
