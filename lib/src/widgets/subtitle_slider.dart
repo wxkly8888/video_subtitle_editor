@@ -12,8 +12,7 @@ class SubtitleSlider extends StatefulWidget {
   const SubtitleSlider({
     super.key,
     required this.controller,
-    this.onSaved,
-    this.onDeleted,
+    required this.onSubtitleUpdated,
     this.height = 100,
     this.subtitleBackgroundColor = const Color(0xFF974836),
     this.touchAreaColor = Colors.grey,
@@ -26,10 +25,10 @@ class SubtitleSlider extends StatefulWidget {
   });
 
   final VideoSubtitleController controller;
-  ///called when a subtitle is saved
-  final Function()? onSaved;
-  ///called when a subtitle is deleted
-  final Function()? onDeleted;
+
+  ///called when a subtitle is updated
+  final Function() onSubtitleUpdated;
+
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
   final Color baselineColor;
@@ -198,6 +197,9 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                                               adjustSubtitleStartTime(details);
                                               setState(() {});
                                             },
+                                            onHorizontalDragEnd: (details) {
+                                              widget.onSubtitleUpdated();
+                                            },
                                             child: Container(
                                               width: touchWidth,
                                               height: widget.height,
@@ -230,6 +232,9 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                                             onHorizontalDragUpdate: (details) {
                                               adjustSubtitleEndTime(details);
                                               setState(() {});
+                                            },
+                                            onHorizontalDragEnd: (details) {
+                                              widget.onSubtitleUpdated();
                                             },
                                             child: Container(
                                               width: touchWidth,
@@ -268,7 +273,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                                 //delete the highlighted subtitle
                                 widget.controller.deleteHighlightedSubtitle();
                                 widget.controller.highlightSubtitle = null;
-                                if(widget.onDeleted != null) widget.onDeleted!();
+                                widget.onSubtitleUpdated();
                                 setState(() {});
                               },
                               child: Container(
@@ -322,8 +327,8 @@ class _SubtitleSliderState extends State<SubtitleSlider>
                 onSaved: () {
                   if (isAdded) {
                     widget.controller.addSubtitle(editSubtitle, index);
-                    if(widget.onSaved != null) widget.onSaved!();
                   }
+                  widget.onSubtitleUpdated();
                   setState(() {});
                 },
               ),
@@ -395,6 +400,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
               widget.controller.videoDuration;
     }
     highlightSubtitle.end = adjustEndX;
+
   }
 
   double calculatePixelsToMiddle() {
