@@ -41,6 +41,8 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
     return subtitleStyle.hasBorder
         ? TextStyle(
             fontSize: subtitleStyle.fontSize,
+            color: subtitleStyle.textColor,
+            fontFamily: subtitleStyle.font,
             foreground: Paint()
               ..style = subtitleStyle.borderStyle.style
               ..strokeWidth = subtitleStyle.borderStyle.strokeWidth
@@ -49,6 +51,7 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
         : TextStyle(
             fontSize: subtitleStyle.fontSize,
             color: subtitleStyle.textColor,
+            fontFamily: subtitleStyle.font,
           );
   }
 

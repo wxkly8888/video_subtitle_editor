@@ -7,4 +7,6 @@ export 'src/utils/subtitle/subtitle_controller.dart';
 export 'src/utils/subtitle/subtitle_provider.dart';
 export 'src/utils/ffmpeg_service.dart';
 export 'src/utils/subtitle/types.dart';
+export 'src/widgets/style/subtitle_style.dart';
+
 export 'src/widgets/subtitle_slider.dart';
