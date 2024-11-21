@@ -110,7 +110,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
       // update trim and video position
       if (_scrollController.position.userScrollDirection !=
           ScrollDirection.idle) {
-        //user is crolling the slider
+        //user is scrolling the slider
         if (widget.controller.isPlaying) {
           widget.controller.video.pause();
         }
@@ -390,6 +390,27 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     highlightSubtitle.end = adjustEndX;
   }
 
+  double calculatePixelsToMiddle() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double horizontalMargin = screenWidth / 2;
+    double currentScrollOffset = _scrollController.offset;
+    return horizontalMargin + currentScrollOffset;
+  }
+   showAddNewSubtitleView(Subtitle subtitle, Subtitle? nextSubtitle, int index) {
+    // Add your logic to add a new subtitle here
+    Subtitle newSubtitle = Subtitle(
+        start: Duration(
+            milliseconds: subtitle.end.inMilliseconds + 100),
+        end: Duration(
+            milliseconds: nextSubtitle != null
+                ? nextSubtitle.start.inMilliseconds - 100
+                : subtitle.end.inMilliseconds + 1000),
+        data: "New Subtitle",
+        index: subtitle.index + 1);
+    _showFullscreenDialog(context, newSubtitle,
+        isAdded: true, index: index + 1);
+  }
+
   _buildSingleSubtitle(Subtitle subtitle) {
     final index = widget.controller.subtitles.indexOf(subtitle);
     Subtitle? nextSubtitle = widget.controller.getNextSubtitle(subtitle);
@@ -400,15 +421,28 @@ class _SubtitleSliderState extends State<SubtitleSlider>
     double iconSize = 30;
     double minToAllowAddIcon = 50;
     bool showAddedIcon = false;
+    //how to calculate how many pixels from the beginning of the slider to the middle of screen
+
     if (index < widget.controller.subtitles.length - 1) {
       spaceToNextSubtitle =
           computeStartX(widget.controller.subtitles[index + 1]) -
               (startX + width);
+    } else {
+      spaceToNextSubtitle = _sliderWidth - (startX + width);
     }
 
     if (spaceToNextSubtitle > minToAllowAddIcon) {
       showAddedIcon = true;
-      addedIconStartX = startX + width + spaceToNextSubtitle / 2 - iconSize / 2;
+      if (_scrollController.hasClients) {
+        if (_scrollController.offset < startX + width + iconSize / 2) {
+          addedIconStartX = startX + width + 5;
+        } else if (_scrollController.offset >
+            startX + width + spaceToNextSubtitle) {
+          addedIconStartX = startX + width + spaceToNextSubtitle - iconSize;
+        } else {
+          addedIconStartX = _scrollController.offset - iconSize / 2;
+        }
+      }
     }
 
     return Stack(
@@ -460,33 +494,40 @@ class _SubtitleSliderState extends State<SubtitleSlider>
             ),
           ),
         ),
-        if (index < widget.controller.subtitles.length - 1 && showAddedIcon)
+        //draw a vertical line at the current video position
+
+        if (showAddedIcon)
           Positioned(
-            left: addedIconStartX,
-            top: widget.height / 2 - iconSize / 2 + 10,
-            child: GestureDetector(
-              onTap: () {
-                // Add your logic to add a new subtitle here
-                Subtitle newSubtitle = Subtitle(
-                    start: Duration(
-                        milliseconds: subtitle.end.inMilliseconds + 100),
-                    end: Duration(
-                        milliseconds: nextSubtitle != null? nextSubtitle.start.inMilliseconds-100 :
-                            subtitle.end.inMilliseconds + 1000),
-                    data: "New Subtitle",
-                    index: subtitle.index + 1);
-                _showFullscreenDialog(context, newSubtitle,
-                    isAdded: true, index: index + 1);
-              },
-              child: Align(
-                  alignment: Alignment.center,
+              left: startX + width,
+              top: 10,
+              child: GestureDetector(
+                  onTap: () {
+                    showAddNewSubtitleView(subtitle, nextSubtitle, index);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Container(
+                      width: spaceToNextSubtitle - 10,
+                      height: widget.height,
+                      decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.all(5.0),
+                    ),
+                  ))),
+        if (showAddedIcon)
+          Positioned(
+              left: addedIconStartX,
+              top: widget.height / 2 - iconSize / 2 + 5,
+              child: GestureDetector(
+                  onTap: () {
+                    showAddNewSubtitleView(subtitle, nextSubtitle, index);
+                  },
                   child: Icon(
                     Icons.add_circle,
                     color: Colors.white,
                     size: iconSize,
-                  )),
-            ),
-          ),
+                  ))),
       ],
     );
   }
