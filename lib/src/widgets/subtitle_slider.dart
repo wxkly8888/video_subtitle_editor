@@ -417,7 +417,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
         end: Duration(
             milliseconds: nextSubtitle != null
                 ? nextSubtitle.start.inMilliseconds - 100
-                : subtitle.end.inMilliseconds + 1000),
+                : widget.controller.videoPosition.inMilliseconds),
         data: "New Subtitle",
         index: subtitle.index + 1);
     _showFullscreenDialog(context, newSubtitle,
