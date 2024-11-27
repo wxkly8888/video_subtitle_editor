@@ -128,7 +128,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
   /// If the expected position is bigger than [subtitleController.endTrim], set it to [subtitleController.endTrim]
   void _controllerSeekTo(double position) async {
     final to = widget.controller.videoDuration *
-        (position / (_sliderWidth + _horizontalMargin * 2));
+        (position / (_sliderWidth ));
     await widget.controller.seekTo(to);
   }
 
