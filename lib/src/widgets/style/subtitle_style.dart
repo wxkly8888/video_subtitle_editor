@@ -6,7 +6,7 @@ import 'subtitle_border_style.dart';
 const _defaultFontSize = 16.0;
 
 class SubtitleStyle {
-   const SubtitleStyle({
+  const SubtitleStyle({
     this.hasBorder = false,
     this.borderStyle = const SubtitleBorderStyle(),
     this.fontSize = _defaultFontSize,

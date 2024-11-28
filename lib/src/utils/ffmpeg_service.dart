@@ -27,8 +27,7 @@ class FFmpegService {
     return '${directory.path}/$outputName';
   }
 
-
- static Future<void> resizeVideoWithPadding({
+  static Future<void> resizeVideoWithPadding({
     required double resizedRatio,
     required String videoPath,
     required String outputPath,
@@ -38,14 +37,15 @@ class FFmpegService {
   }) async {
     final command = [
       '-i', videoPath,
-      '-vf', 'scale=iw*min($resizedRatio/iw\\,1):ih*min($resizedRatio/iw\\,1), pad=$resizedRatio:ih:(ow-iw)/2:(oh-ih)/2',
+      '-vf',
+      'scale=iw*min($resizedRatio/iw\\,1):ih*min($resizedRatio/iw\\,1), pad=$resizedRatio:ih:(ow-iw)/2:(oh-ih)/2',
       '-y', // Overwrite the existing file
       outputPath
     ];
 
     final session = await FFmpegKit.executeWithArgumentsAsync(
       command,
-          (session) async {
+      (session) async {
         final state = await session.getState();
         final code = await session.getReturnCode();
 
@@ -54,7 +54,8 @@ class FFmpegService {
         } else {
           if (onError != null) {
             onError(
-              Exception('FFmpeg process exited with state $state and return code $code.\n${await session.getOutput()}'),
+              Exception(
+                  'FFmpeg process exited with state $state and return code $code.\n${await session.getOutput()}'),
               StackTrace.current,
             );
           }

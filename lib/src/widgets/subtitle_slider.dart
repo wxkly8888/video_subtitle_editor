@@ -127,8 +127,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
   /// Sets the video's current timestamp to be at the [position] on the slider
   /// If the expected position is bigger than [subtitleController.endTrim], set it to [subtitleController.endTrim]
   void _controllerSeekTo(double position) async {
-    final to = widget.controller.videoDuration *
-        (position / (_sliderWidth ));
+    final to = widget.controller.videoDuration * (position / (_sliderWidth));
     await widget.controller.seekTo(to);
   }
 
@@ -400,7 +399,6 @@ class _SubtitleSliderState extends State<SubtitleSlider>
               widget.controller.videoDuration;
     }
     highlightSubtitle.end = adjustEndX;
-
   }
 
   double calculatePixelsToMiddle() {

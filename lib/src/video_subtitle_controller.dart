@@ -128,10 +128,11 @@ class VideoSubtitleController extends ChangeNotifier {
     return buffer.toString();
   }
 
-  addSubtitle(Subtitle subtitle,int index){
+  addSubtitle(Subtitle subtitle, int index) {
     _subtitles.insert(index, subtitle);
     notifyListeners();
   }
+
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String threeDigits(int n) => n.toString().padLeft(3, '0');
