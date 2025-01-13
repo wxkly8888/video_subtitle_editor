@@ -161,20 +161,30 @@ class FFmpegService {
     required String subtitlePath,
     required String outputPath,
     required void Function(File file) onCompleted,
+    int? frameRate,
+    String? resolution,
+    String? format,
     void Function(Object, StackTrace)? onError,
     void Function(Statistics)? onProgress,
   }) {
     final command = [
       '-i', videoPath,
       '-vf', "subtitles=$subtitlePath",
-      '-y', // Add this flag to overwrite the existing file
-      outputPath
-    ]; // log('FFmpeg start process with command = ${execute.command}');
+      if (frameRate != null) ...['-r', frameRate.toString()],
+      if (resolution != null) ...['-s', resolution],
+      '-y', // Overwrite the existing file
+      outputPath,
+    ];
+
+    if (format != null) {
+      command.addAll(['-f', format]);
+    }
+   //print commands
+    print("export command $command");
     return FFmpegKit.executeWithArgumentsAsync(
       command,
-      (session) async {
-        final state =
-            FFmpegKitConfig.sessionStateToString(await session.getState());
+          (session) async {
+        final state = FFmpegKitConfig.sessionStateToString(await session.getState());
         final code = await session.getReturnCode();
 
         if (ReturnCode.isSuccess(code)) {
@@ -182,12 +192,10 @@ class FFmpegService {
         } else {
           if (onError != null) {
             onError(
-              Exception(
-                  'FFmpeg process exited with state $state and return code $code.\n${await session.getOutput()}'),
+              Exception('FFmpeg process exited with state $state and return code $code.\n${await session.getOutput()}'),
               StackTrace.current,
             );
           }
-          return;
         }
       },
       null,
