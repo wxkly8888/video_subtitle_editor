@@ -179,12 +179,13 @@ class FFmpegService {
     if (format != null) {
       command.addAll(['-f', format]);
     }
-   //print commands
+    //print commands
     print("export command $command");
     return FFmpegKit.executeWithArgumentsAsync(
       command,
-          (session) async {
-        final state = FFmpegKitConfig.sessionStateToString(await session.getState());
+      (session) async {
+        final state =
+            FFmpegKitConfig.sessionStateToString(await session.getState());
         final code = await session.getReturnCode();
 
         if (ReturnCode.isSuccess(code)) {
@@ -192,7 +193,8 @@ class FFmpegService {
         } else {
           if (onError != null) {
             onError(
-              Exception('FFmpeg process exited with state $state and return code $code.\n${await session.getOutput()}'),
+              Exception(
+                  'FFmpeg process exited with state $state and return code $code.\n${await session.getOutput()}'),
               StackTrace.current,
             );
           }
