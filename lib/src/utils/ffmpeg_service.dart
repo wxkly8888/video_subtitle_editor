@@ -6,6 +6,7 @@ import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_full/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter_full/return_code.dart';
 import 'package:ffmpeg_kit_flutter_full/statistics.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../video_subtitle_editor.dart';
@@ -172,6 +173,25 @@ class FFmpegService {
     //print commands
     print("export command: $sb");
   }
+
+  static Future<void> copyFontFilesAndRegisterFFmpeg(String assetPath, List fontFiles) async {
+    final tempDir = await getTemporaryDirectory();
+    final fontDir = Directory('${tempDir.path}/fonts');
+    if (!await fontDir.exists()) {
+      await fontDir.create(recursive: true);
+    }
+    for (final fontFile in fontFiles) {
+      final file = File('${fontDir.path}/$fontFile');
+      if(await file.exists()){
+        continue;
+      }
+      final byteData = await rootBundle.load('$assetPath/$fontFile');
+      await file.writeAsBytes(byteData.buffer.asUint8List());
+    }
+    await FFmpegKitConfig.setFontDirectoryList([fontDir.path]);
+    print('Font directories registered successfully.');
+  }
+
   static Future<FFmpegSession> exportVideoWithSubtitles({
     required String videoPath,
     required String subtitlePath,
@@ -195,8 +215,6 @@ class FFmpegService {
         );
       }
 
-      FFmpegKitConfig.setFontDirectoryList(["/system/fonts", "/System/Library/Fonts", "/assets/fonts"]);
-      
       final command = [
         '-i', videoPath,
         '-vf', 'subtitles=$finalSubtitlePath',
