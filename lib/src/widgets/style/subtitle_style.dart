@@ -12,12 +12,22 @@ class SubtitleStyle {
     this.fontSize = _defaultFontSize,
     this.font = 'Arial',
     this.textColor = Colors.white,
+    this.backgroundColor = Colors.transparent,
+    this.outlineColor = Colors.black,
+
     this.position = const SubtitlePosition(),
   });
   final bool hasBorder;
   final SubtitleBorderStyle borderStyle;
   final double fontSize;
   final Color textColor;
+  final Color backgroundColor;
+  final Color outlineColor;
   final String font;
+  final bool bold = false;
+  final bool italic = false;
+  final double outlineWidth = 1.0;
   final SubtitlePosition position;
+
+
 }
