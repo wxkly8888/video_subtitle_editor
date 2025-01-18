@@ -186,10 +186,11 @@ class FFmpegService {
   }) async {
     try {
       // Convert SRT to ASS with styles if style is provided
-      String finalSubtitlePath = subtitlePath;
+      String finalSubtitlePath = subtitlePath.replaceAll("srt", "ass");
       if (subtitleStyle != null) {
-        finalSubtitlePath = await convertSrtToAss(
+        await convertSrtToAss(
           srtPath: subtitlePath,
+          assPath: finalSubtitlePath,
           style: subtitleStyle,
         );
       }
@@ -214,7 +215,6 @@ class FFmpegService {
       }
 
       printCommand(command);
-      
       return await FFmpegKit.executeWithArgumentsAsync(
         command,
         (session) async {
@@ -246,53 +246,71 @@ class FFmpegService {
     }
   }
 
-  static Future<String> convertSrtToAss({
+  static Future<void> convertSrtToAss({
     required String srtPath,
+    required String assPath,
     required SubtitleStyle style,
   }) async {
-    final assPath = srtPath.replaceAll('.srt', '.ass');
-    
-    try {
-      // Build the subtitle conversion command with styles
-      final command = [
-        '-i', srtPath,
-        '-vf', 'subtitles=$srtPath:force_style=\'Fontname=${style.font},'
-              'FontSize=${style.fontSize},'
-              'PrimaryColour=&H${_colorToASSFormat(style.textColor)},'
-              'OutlineColour=&H${_colorToASSFormat(style.outlineColor)},'
-              'BackColour=&H${_colorToASSFormat(style.backgroundColor)},'
-              'Bold=${style.bold ? 1 : 0},'
-              'Italic=${style.italic ? 1 : 0},'
-              'BorderStyle=3,'
-              'Outline=${style.outlineWidth}\'',
-        '-y',
-        assPath
-      ];
+    final srtFile = File(srtPath);
+    final assFile = File(assPath);
 
-      printCommand(command);
-      
-      final session = await FFmpegKit.execute(command.join(' '));
-      final returnCode = await session.getReturnCode();
-
-      if (ReturnCode.isSuccess(returnCode)) {
-        return assPath;
-      } else {
-        final output = await session.getOutput();
-        print('FFmpeg conversion output: $output');
-        throw Exception('Failed to convert SRT to ASS: $output');
-      }
-    } catch (e) {
-      print('Error converting SRT to ASS: $e');
-      // Clean up temp file in case of error
-      throw e;
+    if (!await srtFile.exists()) {
+      throw Exception('SRT file does not exist');
     }
+
+    final srtContent = await srtFile.readAsString();
+    final assContent = _convertSrtContentToAss(srtContent, style);
+
+    await assFile.writeAsString(assContent);
   }
 
-  // Helper method to convert Color to ASS format (AABBGGRR)
-  static String _colorToASSFormat(Color color) {
-    return '${color.alpha.toRadixString(16).padLeft(2, '0')}'
-           '${color.blue.toRadixString(16).padLeft(2, '0')}'
-           '${color.green.toRadixString(16).padLeft(2, '0')}'
-           '${color.red.toRadixString(16).padLeft(2, '0')}';
+ static String _convertSrtContentToAss(String srtContent, SubtitleStyle style) {
+    final buffer = StringBuffer();
+
+    // Write ASS header
+    buffer.writeln('[Script Info]');
+    buffer.writeln('Title: Converted Subtitle');
+    buffer.writeln('ScriptType: v4.00+');
+    buffer.writeln('Collisions: Normal');
+    buffer.writeln('PlayDepth: 0');
+    buffer.writeln('Timer: 100.0000');
+    buffer.writeln('');
+    buffer.writeln('[V4+ Styles]');
+    buffer.writeln('Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding');
+    buffer.writeln('Style: Default,${style.font},${style.fontSize},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.outlineColor)},&H${_colorToASSFormat(style.backgroundColor)},${style.bold ? 1 : 0},${style.italic ? 1 : 0},0,0,100,100,0,0,1,${style.outlineWidth},0,2,10,10,10,1');
+    buffer.writeln('');
+    buffer.writeln('[Events]');
+    buffer.writeln('Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text');
+
+    // Convert SRT to ASS format
+    final srtLines = srtContent.split('\n');
+    for (var i = 0; i < srtLines.length; i++) {
+      if (RegExp(r'^\d+$').hasMatch(srtLines[i])) {
+        final startEnd = srtLines[++i].split(' --> ');
+        final start = _convertSrtTimeToAssTime(startEnd[0]);
+        final end = _convertSrtTimeToAssTime(startEnd[1]);
+        final text = srtLines[++i].replaceAll('\n', '\\N');
+        buffer.writeln('Dialogue: 0,$start,$end,Default,,0,0,0,,$text');
+      }
+    }
+
+    return buffer.toString();
   }
+
+  static String _convertSrtTimeToAssTime(String srtTime) {
+    var parts = srtTime.split(',');
+
+    final timeParts = parts[0].split(':');
+    if(parts[1].length==3){
+      parts[1] = parts[1].substring(0,1);
+    }
+    return '${timeParts[0]}:${timeParts[1]}:${timeParts[2]}.${parts[1]}';
+  }
+
+  static String _colorToASSFormat(Color color) {
+    return '${color.blue.toRadixString(16).padLeft(2, '0')}'
+        '${color.green.toRadixString(16).padLeft(2, '0')}'
+        '${color.red.toRadixString(16).padLeft(2, '0')}';
+  }
+
 }
