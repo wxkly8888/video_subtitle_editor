@@ -188,7 +188,7 @@ class FFmpegService {
       final byteData = await rootBundle.load('$assetPath/$fontFile');
       await file.writeAsBytes(byteData.buffer.asUint8List());
     }
-    await FFmpegKitConfig.setFontDirectoryList([fontDir.path]);
+    await FFmpegKitConfig.setFontDirectory(fontDir.path,{});
     print('Font directories registered successfully.');
   }
 
