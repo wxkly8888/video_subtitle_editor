@@ -6,7 +6,7 @@ import 'subtitle_border_style.dart';
 const _defaultFontSize = 16.0;
 
 class SubtitleStyle {
-  const SubtitleStyle({
+  SubtitleStyle({
     this.hasBorder = false,
     this.borderStyle = const SubtitleBorderStyle(),
     this.fontSize = _defaultFontSize,
@@ -14,9 +14,9 @@ class SubtitleStyle {
     this.textColor = Colors.white,
     this.backgroundColor = Colors.transparent,
     this.outlineColor = Colors.black,
+    SubtitlePosition? position,
+  }) : position = position ?? SubtitlePosition();  // Remove const
 
-    this.position = const SubtitlePosition(),
-  });
   final bool hasBorder;
   final SubtitleBorderStyle borderStyle;
   final double fontSize;
@@ -27,7 +27,5 @@ class SubtitleStyle {
   final bool bold = false;
   final bool italic = false;
   final double outlineWidth = 1.0;
-  final SubtitlePosition position;
-
-
+  final SubtitlePosition position;  // Keep final, but the object itself is mutable
 }

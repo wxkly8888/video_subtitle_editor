@@ -14,6 +14,7 @@ class SubtitleSlider extends StatefulWidget {
     required this.controller,
     required this.onSubtitleUpdated,
     this.height = 100,
+    this.onHighlight,
     this.subtitleBackgroundColor = const Color(0xFF974836),
     this.touchAreaColor = Colors.grey,
     this.baselineColor = Colors.redAccent,
@@ -32,6 +33,8 @@ class SubtitleSlider extends StatefulWidget {
   /// The [height] param specifies the height of the generated thumbnails
   final double height;
   final Color baselineColor;
+
+  final Function(bool ishighlight)? onHighlight;
 
   ///the background color of the subtitle
   final Color subtitleBackgroundColor;
@@ -466,7 +469,9 @@ class _SubtitleSliderState extends State<SubtitleSlider>
               if (isHighlighted) {
                 if (widget.controller.highlightSubtitle == subtitle) {
                   _showFullscreenDialog(context, subtitle);
+                  widget.onHighlight?.call(false);
                 } else {
+                  widget.onHighlight?.call(true);
                   widget.controller.highlightSubtitle = subtitle;
                 }
               } else {

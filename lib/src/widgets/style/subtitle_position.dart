@@ -1,14 +1,20 @@
 const _defaultSubtitleBottomPosition = 50.0;
 
 class SubtitlePosition {
-  const SubtitlePosition({
+  SubtitlePosition({
     this.left = 0.0,
     this.right = 0.0,
     this.top,
-    this.bottom = _defaultSubtitleBottomPosition,
-  });
+    double bottom = _defaultSubtitleBottomPosition,
+  }) : _bottom = bottom;
+
   final double left;
   final double right;
   final double? top;
-  final double bottom;
+  double _bottom;
+  
+  double get bottom => _bottom;
+  set bottom(double value) {
+    _bottom = value;
+  }
 }
