@@ -192,11 +192,27 @@ class FFmpegService {
     print('Font directories registered successfully.');
   }
 
+  /**
+   * const List<String> videoResolutions = [
+      "1920x1080",
+      "1280x720",
+      "854x480",
+      ];
+
+   */
+  static getWidthFromResolution(String resolution){
+    return int.parse(resolution.split("x")[0]);
+  }
+  static getHeightFromResolution(String resolution){
+    return int.parse(resolution.split("x")[1]);
+  }
   static Future<FFmpegSession> exportVideoWithSubtitles({
     required String videoPath,
     required String subtitlePath,
     required String outputPath,
     required void Function(File file) onCompleted,
+    double width = 1280,
+    double height = 720,
     int? frameRate,
     String? resolution,
     String? format,
@@ -212,6 +228,9 @@ class FFmpegService {
           srtPath: subtitlePath,
           assPath: finalSubtitlePath,
           style: subtitleStyle,
+          height:height,
+          width: width,
+          resolution: resolution??"1280x720"
         );
       }
 
@@ -267,7 +286,10 @@ class FFmpegService {
   static Future<void> convertSrtToAss({
     required String srtPath,
     required String assPath,
+    required String resolution,
     required SubtitleStyle style,
+    double height = 720,
+    double width = 1280,
   }) async {
     final srtFile = File(srtPath);
     final assFile = File(assPath);
@@ -275,16 +297,14 @@ class FFmpegService {
     if (!await srtFile.exists()) {
       throw Exception('SRT file does not exist');
     }
-
+    double rate = height/getHeightFromResolution(resolution);
     final srtContent = await srtFile.readAsString();
-    final assContent = _convertSrtContentToAss(srtContent, style);
-
+    final assContent = _convertSrtContentToAss(srtContent, style, rate);
     await assFile.writeAsString(assContent);
   }
-
- static String _convertSrtContentToAss(String srtContent, SubtitleStyle style) {
+ static String _convertSrtContentToAss(String srtContent, SubtitleStyle style, double rate) {
+   final relativeBottom = (style.position.bottom / rate) ;
     final buffer = StringBuffer();
-
     // Write ASS header
     buffer.writeln('[Script Info]');
     buffer.writeln('Title: Converted Subtitle');
@@ -295,7 +315,7 @@ class FFmpegService {
     buffer.writeln('');
     buffer.writeln('[V4+ Styles]');
     buffer.writeln('Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding');
-    buffer.writeln('Style: Default,${style.font},${style.fontSize},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.outlineColor)},&H${_colorToASSFormat(style.backgroundColor)},${style.bold ? 1 : 0},${style.italic ? 1 : 0},0,0,100,100,0,0,1,${style.outlineWidth},0,2,10,10,10,1');
+    buffer.writeln('Style: Default,${style.font},${style.fontSize},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.outlineColor)},&H${_colorToASSFormat(style.backgroundColor)},${style.bold ? 1 : 0},${style.italic ? 1 : 0},0,0,100,100,0,0,1,${style.outlineWidth},0,2,10,10,${relativeBottom},1');
     buffer.writeln('');
     buffer.writeln('[Events]');
     buffer.writeln('Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text');

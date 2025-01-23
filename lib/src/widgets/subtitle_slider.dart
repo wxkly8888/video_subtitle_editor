@@ -121,6 +121,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
         if (widget.controller.isPlaying) {
           widget.controller.video.pause();
         }
+        widget.onHighlight?.call(false);
         widget.controller.highlightSubtitle = null;
         _controllerSeekTo(_scrollController.offset);
       } else {}
@@ -469,13 +470,12 @@ class _SubtitleSliderState extends State<SubtitleSlider>
               if (isHighlighted) {
                 if (widget.controller.highlightSubtitle == subtitle) {
                   _showFullscreenDialog(context, subtitle);
-                  widget.onHighlight?.call(false);
                 } else {
-                  widget.onHighlight?.call(true);
                   widget.controller.highlightSubtitle = subtitle;
                 }
               } else {
                 widget.controller.video.pause();
+                widget.onHighlight?.call(true);
                 widget.controller.highlightSubtitle = subtitle;
               }
               setState(() {});
