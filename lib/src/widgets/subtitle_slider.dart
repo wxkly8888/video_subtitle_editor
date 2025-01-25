@@ -300,8 +300,7 @@ class _SubtitleSliderState extends State<SubtitleSlider>
             padding: const EdgeInsets.only(top: 15),
             child: Column(
               children: [
-                Image.asset('images/inverted_triangle.png',
-                    package: "video_subtitle_editor",
+                Image.asset('assets/images/inverted_triangle.png',
                     width: 20,
                     color: widget.baselineColor),
                 Container(
