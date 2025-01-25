@@ -45,17 +45,17 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
   Widget build(BuildContext context) {
     return videoSubtitleController.currentSubtitle == null
         ? Container()
-        :  DashedLineWidget(
-              isVisible: subtitleStyle.hasBorder,
-              child: _TextContent(
-                text: getSubtitleText(),
-                textStyle: TextStyle(
-                  fontSize: subtitleStyle.fontSize,
-                  color: subtitleStyle.textColor,
-                  fontFamily: subtitleStyle.font,
-                ),
+        : DashedLineWidget(
+            isVisible: subtitleStyle.hasBorder,
+            child: _TextContent(
+              text: getSubtitleText(),
+              textStyle: TextStyle(
+                fontSize: subtitleStyle.fontSize,
+                color: subtitleStyle.textColor,
+                fontFamily: subtitleStyle.font,
               ),
-            );
+            ),
+          );
   }
 
   getSubtitleText() {

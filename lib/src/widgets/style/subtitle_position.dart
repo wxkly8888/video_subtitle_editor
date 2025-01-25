@@ -1,4 +1,5 @@
-enum LayoutType { bottom,center,top}
+enum LayoutType { bottom, center, top }
+
 class SubtitlePosition {
   SubtitlePosition({
     this.left = 0.0,
@@ -16,6 +17,7 @@ class SubtitlePosition {
   set setTop(double value) {
     top = value;
   }
+
   //set bottom
   set setBottom(double value) {
     bottom = value;

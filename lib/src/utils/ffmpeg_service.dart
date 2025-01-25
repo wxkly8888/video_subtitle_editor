@@ -121,8 +121,6 @@ class FFmpegService {
     void Function(Object, StackTrace)? onError,
     void Function(Statistics)? onProgress,
   }) {
-
-
     var command = [
       '-i', videoPath,
       '-vn',
@@ -165,16 +163,18 @@ class FFmpegService {
       onProgress,
     );
   }
-  static void printCommand(List<String> commandList){
+
+  static void printCommand(List<String> commandList) {
     String sb = "ffmpeg";
-    for(int i = 0; i < commandList.length; i++){
+    for (int i = 0; i < commandList.length; i++) {
       sb += " ${commandList[i]}";
     }
     //print commands
     print("export command: $sb");
   }
 
-  static Future<void> copyFontFilesAndRegisterFFmpeg(String assetPath, List fontFiles) async {
+  static Future<void> copyFontFilesAndRegisterFFmpeg(
+      String assetPath, List fontFiles) async {
     final tempDir = await getTemporaryDirectory();
     final fontDir = Directory('${tempDir.path}/fonts');
     if (!await fontDir.exists()) {
@@ -182,13 +182,13 @@ class FFmpegService {
     }
     for (final fontFile in fontFiles) {
       final file = File('${fontDir.path}/$fontFile');
-      if(await file.exists()){
+      if (await file.exists()) {
         continue;
       }
       final byteData = await rootBundle.load('$assetPath/$fontFile');
       await file.writeAsBytes(byteData.buffer.asUint8List());
     }
-    await FFmpegKitConfig.setFontDirectory(fontDir.path,{});
+    await FFmpegKitConfig.setFontDirectory(fontDir.path, {});
     print('Font directories registered successfully.');
   }
 
@@ -200,12 +200,14 @@ class FFmpegService {
       ];
 
    */
-  static getWidthFromResolution(String resolution){
+  static getWidthFromResolution(String resolution) {
     return int.parse(resolution.split("x")[0]);
   }
-  static getHeightFromResolution(String resolution){
+
+  static getHeightFromResolution(String resolution) {
     return int.parse(resolution.split("x")[1]);
   }
+
   static Future<FFmpegSession> exportVideoWithSubtitles({
     required String videoPath,
     required String subtitlePath,
@@ -225,24 +227,29 @@ class FFmpegService {
       String finalSubtitlePath = subtitlePath.replaceAll("srt", "ass");
       if (subtitleStyle != null) {
         await convertSrtToAss(
-          srtPath: subtitlePath,
-          assPath: finalSubtitlePath,
-          style: subtitleStyle,
-          height:height,
-          width: width,
-          resolution: resolution??"1280x720"
-        );
+            srtPath: subtitlePath,
+            assPath: finalSubtitlePath,
+            style: subtitleStyle,
+            height: height,
+            width: width,
+            resolution: resolution ?? "1280x720");
       }
 
       final command = [
-        '-i', videoPath,
-        '-vf', 'subtitles=$finalSubtitlePath',
+        '-i',
+        videoPath,
+        '-vf',
+        'subtitles=$finalSubtitlePath',
         if (frameRate != null) ...['-r', frameRate.toString()],
         if (resolution != null) ...['-s', resolution],
-        '-c:v', 'mpeg4',
-        '-q:v', '2',
-        '-c:a', 'aac',
-        '-b:a', '128k',
+        '-c:v',
+        'mpeg4',
+        '-q:v',
+        '2',
+        '-c:a',
+        'aac',
+        '-b:a',
+        '128k',
         '-y',
         outputPath,
       ];
@@ -255,7 +262,8 @@ class FFmpegService {
       return await FFmpegKit.executeWithArgumentsAsync(
         command,
         (session) async {
-          final state = FFmpegKitConfig.sessionStateToString(await session.getState());
+          final state =
+              FFmpegKitConfig.sessionStateToString(await session.getState());
           final code = await session.getReturnCode();
           final output = await session.getOutput();
           print("FFmpeg output: $output");
@@ -265,7 +273,8 @@ class FFmpegService {
           } else {
             if (onError != null) {
               onError(
-                Exception('FFmpeg process exited with state $state and return code $code.\n$output'),
+                Exception(
+                    'FFmpeg process exited with state $state and return code $code.\n$output'),
                 StackTrace.current,
               );
             }
@@ -297,13 +306,15 @@ class FFmpegService {
     if (!await srtFile.exists()) {
       throw Exception('SRT file does not exist');
     }
-    double rate = height/getHeightFromResolution(resolution);
+    double rate = height / getHeightFromResolution(resolution);
     final srtContent = await srtFile.readAsString();
     final assContent = _convertSrtContentToAss(srtContent, style, rate);
     await assFile.writeAsString(assContent);
   }
- static String _convertSrtContentToAss(String srtContent, SubtitleStyle style, double rate) {
-   // final relativeBottom = (style.position.bottom / rate) ;
+
+  static String _convertSrtContentToAss(
+      String srtContent, SubtitleStyle style, double rate) {
+    // final relativeBottom = (style.position.bottom / rate) ;
     final relativeBottom = 0;
     final buffer = StringBuffer();
     // Write ASS header
@@ -315,11 +326,14 @@ class FFmpegService {
     buffer.writeln('Timer: 100.0000');
     buffer.writeln('');
     buffer.writeln('[V4+ Styles]');
-    buffer.writeln('Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding');
-    buffer.writeln('Style: Default,${style.font},${style.fontSize},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.outlineColor)},&H${_colorToASSFormat(style.backgroundColor)},${style.bold ? 1 : 0},${style.italic ? 1 : 0},0,0,100,100,0,0,1,${style.outlineWidth},0,2,10,10,${relativeBottom},1');
+    buffer.writeln(
+        'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding');
+    buffer.writeln(
+        'Style: Default,${style.font},${style.fontSize},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.textColor)},&H${_colorToASSFormat(style.outlineColor)},&H${_colorToASSFormat(style.backgroundColor)},${style.bold ? 1 : 0},${style.italic ? 1 : 0},0,0,100,100,0,0,1,${style.outlineWidth},0,2,10,10,${relativeBottom},1');
     buffer.writeln('');
     buffer.writeln('[Events]');
-    buffer.writeln('Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text');
+    buffer.writeln(
+        'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text');
 
     // Convert SRT to ASS format
     final srtLines = srtContent.split('\n');
@@ -340,8 +354,8 @@ class FFmpegService {
     var parts = srtTime.split(',');
 
     final timeParts = parts[0].split(':');
-    if(parts[1].length==3){
-      parts[1] = parts[1].substring(0,1);
+    if (parts[1].length == 3) {
+      parts[1] = parts[1].substring(0, 1);
     }
     return '${timeParts[0]}:${timeParts[1]}:${timeParts[2]}.${parts[1]}';
   }
@@ -351,5 +365,4 @@ class FFmpegService {
         '${color.green.toRadixString(16).padLeft(2, '0')}'
         '${color.red.toRadixString(16).padLeft(2, '0')}';
   }
-
 }

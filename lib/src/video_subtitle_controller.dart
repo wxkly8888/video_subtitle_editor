@@ -45,7 +45,6 @@ class VideoSubtitleController extends ChangeNotifier {
 
   double get videoHeight => videoDimension.height;
 
-
   /// Constructs a [VideoSubtitleController] that edits a video from a file.
   ///[dataSource] is the path of the video file.
   VideoSubtitleController.file(this.dataSource)

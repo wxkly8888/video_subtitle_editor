@@ -4,7 +4,8 @@ import 'package:video_subtitle_editor/src/widgets/style/subtitle_position.dart';
 import 'subtitle_border_style.dart';
 
 const _defaultFontSize = 16.0;
-enum CapitalType { ab,AB, Ab }
+
+enum CapitalType { ab, AB, Ab }
 
 class SubtitleStyle {
   SubtitleStyle({
@@ -16,7 +17,7 @@ class SubtitleStyle {
     this.capitalType = CapitalType.ab,
     this.backgroundColor = Colors.transparent,
     this.outlineColor = Colors.black,
-  });  // Remove const
+  }); // Remove const
 
   final bool hasBorder;
   final SubtitleBorderStyle borderStyle;
