@@ -4,7 +4,7 @@ import 'package:video_subtitle_editor/src/widgets/style/subtitle_position.dart';
 import 'subtitle_border_style.dart';
 
 const _defaultFontSize = 16.0;
-
+enum CapitalType { ab,AB, Ab }
 class SubtitleStyle {
   SubtitleStyle({
     this.hasBorder = false,
@@ -12,6 +12,7 @@ class SubtitleStyle {
     this.fontSize = _defaultFontSize,
     this.font = 'Arial',
     this.textColor = Colors.white,
+    this.capitalType = CapitalType.ab,
     this.backgroundColor = Colors.transparent,
     this.outlineColor = Colors.black,
     SubtitlePosition? position,
@@ -27,5 +28,6 @@ class SubtitleStyle {
   final bool bold = false;
   final bool italic = false;
   final double outlineWidth = 1.0;
+  final CapitalType capitalType;
   final SubtitlePosition position;  // Keep final, but the object itself is mutable
 }

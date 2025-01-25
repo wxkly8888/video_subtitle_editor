@@ -41,24 +41,6 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
     if (mounted) setState(() {});
   }
 
-  // TextStyle get _textStyle {
-  //   return subtitleStyle.hasBorder
-  //       ? TextStyle(
-  //           fontSize: subtitleStyle.fontSize,
-  //           color: subtitleStyle.textColor,
-  //           fontFamily: subtitleStyle.font,
-  //           foreground: Paint()
-  //             ..style = subtitleStyle.borderStyle.style
-  //             ..strokeWidth = subtitleStyle.borderStyle.strokeWidth
-  //             ..color = subtitleStyle.borderStyle.color,
-  //         )
-  //       : TextStyle(
-  //           fontSize: subtitleStyle.fontSize,
-  //           color: subtitleStyle.textColor,
-  //           fontFamily: subtitleStyle.font,
-  //         );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return videoSubtitleController.currentSubtitle == null
@@ -85,8 +67,7 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
                           isVisible: subtitleStyle.hasBorder,
                           child: _TextContent(
                             text:
-                                videoSubtitleController.currentSubtitle?.data ??
-                                    "",
+                            getSubtitleText(),
                             textStyle: TextStyle(
                               fontSize: subtitleStyle.fontSize,
                               color: subtitleStyle.textColor,
@@ -97,6 +78,19 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
                       ))),
             ],
           );
+  }
+  getSubtitleText() {
+    if(videoSubtitleController.currentSubtitle == null) return "";
+    String subtitle = videoSubtitleController.currentSubtitle?.data ?? "";
+    if(subtitleStyle.capitalType == CapitalType.ab) {
+      return subtitle.toLowerCase() ?? "";
+    } else if(subtitleStyle.capitalType == CapitalType.AB) {
+      return subtitle.toUpperCase() ?? "";
+    }else{
+      // CapitalType.Ab,  Capitalizes the first letter
+      return subtitle.substring(0, 1).toUpperCase() + subtitle.substring(1).toLowerCase();
+    }
+    return videoSubtitleController.currentSubtitle?.data ?? "";
   }
 }
 
