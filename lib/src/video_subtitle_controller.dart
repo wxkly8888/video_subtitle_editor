@@ -10,6 +10,9 @@ class VideoSubtitleController extends ChangeNotifier {
   final String dataSource;
   final VideoPlayerController _video;
 
+  double displayWidth = 0;
+  double displayHeight = 0;
+
   List<Subtitle> _subtitles = [];
 
   List<Subtitle> get subtitles => _subtitles;
@@ -41,6 +44,7 @@ class VideoSubtitleController extends ChangeNotifier {
   double get videoWidth => videoDimension.width;
 
   double get videoHeight => videoDimension.height;
+
 
   /// Constructs a [VideoSubtitleController] that edits a video from a file.
   ///[dataSource] is the path of the video file.

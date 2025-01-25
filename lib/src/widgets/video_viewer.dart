@@ -17,6 +17,8 @@ class VideoViewer extends StatelessWidget {
     //get screen width
     var screenWidth = MediaQuery.of(context).size.width;
     final double videoHeight = screenWidth / controller.video.value.aspectRatio;
+    controller.displayWidth = screenWidth;
+    controller.displayHeight = videoHeight;
     print("videoHeight: $videoHeight videoWidth: $screenWidth");
     return GestureDetector(onTap: () {
       print("tap video called");
