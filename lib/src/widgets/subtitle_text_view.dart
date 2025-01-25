@@ -45,50 +45,30 @@ class _SubtitleTextViewState extends State<SubtitleTextView> {
   Widget build(BuildContext context) {
     return videoSubtitleController.currentSubtitle == null
         ? Container()
-        : Stack(
-            children: <Widget>[
-              Padding(
-                  padding: EdgeInsets.only(bottom: subtitleStyle.position.bottom),
-                  child: GestureDetector(
-                      onPanUpdate: (details) {
-                        if (!subtitleStyle.hasBorder) return;
-                        setState(() {
-                          subtitleStyle.position.bottom =
-                              subtitleStyle.position.bottom - details.delta.dy;
-                          if(subtitleStyle.position.bottom < 0) {
-                            subtitleStyle.position.bottom = 0;
-                          }else if(subtitleStyle.position.bottom >videoSubtitleController.videoHeight/2)  {
-                            subtitleStyle.position.bottom = videoSubtitleController.videoHeight/2;
-                          }
-                        });
-                      },
-                      child: Center(
-                        child: DashedLineWidget(
-                          isVisible: subtitleStyle.hasBorder,
-                          child: _TextContent(
-                            text:
-                            getSubtitleText(),
-                            textStyle: TextStyle(
-                              fontSize: subtitleStyle.fontSize,
-                              color: subtitleStyle.textColor,
-                              fontFamily: subtitleStyle.font,
-                            ),
-                          ),
-                        ),
-                      ))),
-            ],
-          );
+        :  DashedLineWidget(
+              isVisible: subtitleStyle.hasBorder,
+              child: _TextContent(
+                text: getSubtitleText(),
+                textStyle: TextStyle(
+                  fontSize: subtitleStyle.fontSize,
+                  color: subtitleStyle.textColor,
+                  fontFamily: subtitleStyle.font,
+                ),
+              ),
+            );
   }
+
   getSubtitleText() {
-    if(videoSubtitleController.currentSubtitle == null) return "";
+    if (videoSubtitleController.currentSubtitle == null) return "";
     String subtitle = videoSubtitleController.currentSubtitle?.data ?? "";
-    if(subtitleStyle.capitalType == CapitalType.ab) {
+    if (subtitleStyle.capitalType == CapitalType.ab) {
       return subtitle.toLowerCase() ?? "";
-    } else if(subtitleStyle.capitalType == CapitalType.AB) {
+    } else if (subtitleStyle.capitalType == CapitalType.AB) {
       return subtitle.toUpperCase() ?? "";
-    }else{
+    } else {
       // CapitalType.Ab,  Capitalizes the first letter
-      return subtitle.substring(0, 1).toUpperCase() + subtitle.substring(1).toLowerCase();
+      return subtitle.substring(0, 1).toUpperCase() +
+          subtitle.substring(1).toLowerCase();
     }
     return videoSubtitleController.currentSubtitle?.data ?? "";
   }

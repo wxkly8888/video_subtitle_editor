@@ -9,6 +9,7 @@ export 'src/utils/ffmpeg_service.dart';
 export 'src/utils/subtitle/types.dart';
 export 'src/widgets/style/subtitle_style.dart';
 export 'src/widgets/style/subtitle_border_style.dart';
+export 'src/widgets/style/subtitle_position.dart';
 export 'src/models/subtitle.dart';
 
 export 'src/widgets/subtitle_slider.dart';

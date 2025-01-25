@@ -303,7 +303,8 @@ class FFmpegService {
     await assFile.writeAsString(assContent);
   }
  static String _convertSrtContentToAss(String srtContent, SubtitleStyle style, double rate) {
-   final relativeBottom = (style.position.bottom / rate) ;
+   // final relativeBottom = (style.position.bottom / rate) ;
+    final relativeBottom = 0;
     final buffer = StringBuffer();
     // Write ASS header
     buffer.writeln('[Script Info]');

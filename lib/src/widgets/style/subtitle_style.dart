@@ -5,6 +5,7 @@ import 'subtitle_border_style.dart';
 
 const _defaultFontSize = 16.0;
 enum CapitalType { ab,AB, Ab }
+
 class SubtitleStyle {
   SubtitleStyle({
     this.hasBorder = false,
@@ -15,8 +16,7 @@ class SubtitleStyle {
     this.capitalType = CapitalType.ab,
     this.backgroundColor = Colors.transparent,
     this.outlineColor = Colors.black,
-    SubtitlePosition? position,
-  }) : position = position ?? SubtitlePosition();  // Remove const
+  });  // Remove const
 
   final bool hasBorder;
   final SubtitleBorderStyle borderStyle;
@@ -29,5 +29,4 @@ class SubtitleStyle {
   final bool italic = false;
   final double outlineWidth = 1.0;
   final CapitalType capitalType;
-  final SubtitlePosition position;  // Keep final, but the object itself is mutable
 }
